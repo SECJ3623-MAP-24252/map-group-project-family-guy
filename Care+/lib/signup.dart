@@ -34,9 +34,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
   void handleSignUp() {
     if (_formKey.currentState!.validate()) {
-      // Perform sign-up logic (e.g. Firebase or backend integration)
       print("Sign-up successful!");
       Navigator.pushReplacementNamed(context, '/login');
     }
@@ -45,14 +47,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Register"), centerTitle: true),
+      appBar: AppBar(title: Text("CARE PLUS Register"), centerTitle: true),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              // Role selection
               DropdownButtonFormField<String>(
                 value: selectedRole,
                 hint: Text("Select Role"),
@@ -65,13 +66,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   });
                 },
                 validator: (value) => value == null ? 'Please select a role' : null,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                ),
+                decoration: InputDecoration(prefixIcon: Icon(Icons.person)),
               ),
               SizedBox(height: 15),
 
-              // Name, Email, Password fields
               TextFormField(
                 controller: nameController,
                 decoration: InputDecoration(
@@ -81,6 +79,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 validator: (value) => value == null || value.isEmpty ? 'Name is required' : null,
               ),
               SizedBox(height: 10),
+
               TextFormField(
                 controller: emailController,
                 decoration: InputDecoration(
@@ -91,27 +90,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 validator: (value) => value != null && value.contains('@') ? null : 'Enter a valid email',
               ),
               SizedBox(height: 10),
+
               TextFormField(
                 controller: passwordController,
-                obscureText: true,
+                obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   labelText: "Password",
                   prefixIcon: Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
                 ),
                 validator: (value) => value != null && value.length >= 6 ? null : 'Minimum 6 characters required',
               ),
               SizedBox(height: 10),
+
               TextFormField(
                 controller: confirmPasswordController,
-                obscureText: true,
+                obscureText: _obscureConfirmPassword,
                 decoration: InputDecoration(
                   labelText: "Confirm Password",
                   prefixIcon: Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscureConfirmPassword ? Icons.visibility_off : Icons.visibility),
+                    onPressed: () {
+                      setState(() {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      });
+                    },
+                  ),
                 ),
                 validator: (value) => value == passwordController.text ? null : 'Passwords do not match',
               ),
               SizedBox(height: 10),
-              // Contact Number Field
+
               TextFormField(
                 controller: contactNumberController,
                 decoration: InputDecoration(
@@ -129,7 +146,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 },
               ),
 
-              // Guardian Section
               if (selectedRole == "Guardian") ...[
                 SizedBox(height: 20),
                 TextFormField(
@@ -150,18 +166,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   onChanged: (value) {
                     setState(() {
                       selectedRelationship = value;
-                      // If "Other" is selected, show the manual input field
                       if (selectedRelationship == "Other") {
-                        customRelationshipController.text = ''; // Clear the custom text if "Other" is selected
+                        customRelationshipController.text = '';
                       }
                     });
                   },
                   validator: (value) => value == null ? 'Please select a relationship' : null,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.link),
-                  ),
+                  decoration: InputDecoration(prefixIcon: Icon(Icons.link)),
                 ),
-                // If "Other" is selected, show a text field to input the custom relationship
                 if (selectedRelationship == "Other") ...[
                   SizedBox(height: 15),
                   TextFormField(
@@ -175,7 +187,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ],
               ],
 
-              // Senior Section
               if (selectedRole == "Senior") ...[
                 SizedBox(height: 20),
                 Card(
@@ -189,8 +200,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         Text("Medical History", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent)),
                         Divider(),
                         SizedBox(height: 10),
-
-                        // Existing Conditions Dropdown
                         DropdownButtonFormField<String>(
                           value: selectedCondition,
                           hint: Text("Select Existing Condition"),
@@ -203,9 +212,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             });
                           },
                           validator: (value) => value == null ? 'Please select a condition' : null,
-                          decoration: InputDecoration(
-                            prefixIcon: Icon(Icons.medical_services),
-                          ),
+                          decoration: InputDecoration(prefixIcon: Icon(Icons.medical_services)),
                         ),
                         if (selectedCondition == 'Other') ...[
                           SizedBox(height: 10),
@@ -220,8 +227,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ],
                         SizedBox(height: 15),
-
-                        // Allergies and Medications
                         TextFormField(
                           controller: allergiesController,
                           decoration: InputDecoration(
@@ -251,6 +256,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ElevatedButton.icon(
                 icon: Icon(Icons.person_add),
                 label: Text("Register"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green, // Use backgroundColor instead of primary
+                ),
                 onPressed: handleSignUp,
               ),
               TextButton(
@@ -284,8 +292,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ElevatedButton(
               onPressed: () {
                 String phone = phoneController.text.trim();
-                if (phone.isNotEmpty &&
-                    RegExp(r'^\+?\d{9,15}$').hasMatch(phone)) {
+                if (phone.isNotEmpty && RegExp(r'^\+?\d{9,15}$').hasMatch(phone)) {
                   print("Phone: $phone");
                   print("Role: $selectedRole");
                   Navigator.of(context).pop();
@@ -294,9 +301,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("Please enter a valid phone number"),
-                    ),
+                    SnackBar(content: Text("Please enter a valid phone number at least 9 digits")),
                   );
                 }
               },
