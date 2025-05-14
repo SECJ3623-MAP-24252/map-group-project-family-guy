@@ -263,4 +263,48 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
+
+  void showPhoneSignUpDialog(BuildContext context) {
+    final phoneController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Phone Sign Up"),
+          content: TextField(
+            controller: phoneController,
+            keyboardType: TextInputType.phone,
+            decoration: InputDecoration(hintText: "Enter your phone number"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                String phone = phoneController.text.trim();
+                if (phone.isNotEmpty &&
+                    RegExp(r'^\+?\d{9,15}$').hasMatch(phone)) {
+                  print("Phone: $phone");
+                  print("Role: $selectedRole");
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Phone signed up successfully")),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Please enter a valid phone number"),
+                    ),
+                  );
+                }
+              },
+              child: Text("Sign Up"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
