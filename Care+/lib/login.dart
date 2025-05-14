@@ -6,6 +6,92 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController otpController = TextEditingController();
 
+  // Show reset password dialog
+  void _showResetPasswordDialog(BuildContext context) {
+    TextEditingController resetEmailController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Reset Password"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: resetEmailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  hintText: "Enter your registered email",
+                  prefixIcon: Icon(Icons.email),
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                String email = resetEmailController.text.trim();
+                if (email.isNotEmpty) {
+                  // Simulate sending the password reset request
+                  Navigator.pop(context);
+                  _showResetPasswordSuccessDialog(context);
+                } else {
+                  _showErrorDialog(context, "Please enter a valid email address.");
+                }
+              },
+              child: Text("Send Reset Link"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Show success message after resetting password
+  void _showResetPasswordSuccessDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Password Reset Link Sent"),
+          content: Text("A link to reset your password has been sent to your email."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Show error dialog
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Error"),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showPhoneLoginDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -254,7 +340,7 @@ class LoginScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
 
-              // 登录按钮
+              // Login button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -273,7 +359,7 @@ class LoginScreen extends StatelessWidget {
                     String email = emailController.text.trim();
                     String password = passwordController.text;
 
-                    if (email == "example@google.com" &&
+                    if (email == "example@gmail.com" &&
                         password == "password") {
                       Navigator.pushReplacementNamed(context, '/main');
                     } else {
@@ -284,7 +370,7 @@ class LoginScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
 
-              // Phone 登录按钮
+              // Phone login button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -306,7 +392,7 @@ class LoginScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
 
-              // Google 登录按钮
+              // Google login button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -328,7 +414,7 @@ class LoginScreen extends StatelessWidget {
               ),
               SizedBox(height: 40),
 
-              // 注册跳转
+              // Register link
               Align(
                 alignment: Alignment.bottomCenter,
                 child: TextButton(
@@ -337,6 +423,20 @@ class LoginScreen extends StatelessWidget {
                   },
                   child: Text(
                     "Don't have an account? Register now!",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ),
+
+              // Reset password link
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: TextButton(
+                  onPressed: () {
+                    _showResetPasswordDialog(context);
+                  },
+                  child: Text(
+                    "Forgot password?",
                     style: TextStyle(color: Colors.black),
                   ),
                 ),
