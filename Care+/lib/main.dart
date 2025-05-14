@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'signup.dart';
-import 'login.dart'; // 导入 LoginScreen
-import 'homepage.dart'; // 导入 MainScreen
+import 'login.dart'; 
+import 'homepage.dart'; 
 
 void main() {
   runApp(HealthMonitorApp());
@@ -14,10 +14,10 @@ class HealthMonitorApp extends StatelessWidget {
       title: 'Senior Health Monitor',
       theme: ThemeData(primarySwatch: Colors.teal),
       debugShowCheckedModeBanner: false,
-      initialRoute: '/login', // 启动时跳转到登录页面
+      initialRoute: '/login', 
       routes: {
         '/signup': (context) => SignUpScreen(),
-        '/login': (context) => LoginScreen(), // 确保 LoginScreen 作为 Widget 使用
+        '/login': (context) => LoginScreen(), 
         '/main': (context) => MainScreen(),
       },
     );
