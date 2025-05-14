@@ -47,7 +47,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("CARE PLUS Register"), centerTitle: true),
+      appBar: AppBar(title: Text("CARE PLUS REGISTER"), centerTitle: true),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(20),
         child: Form(
