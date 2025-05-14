@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
@@ -116,7 +117,8 @@ class LoginScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                if (phoneController.text.isNotEmpty) {
+                if (phoneController.text.isNotEmpty &&
+                    _isValidPhoneNumber(phoneController.text)) {
                   Navigator.pop(context);
                   _showOtpDialog(context);
                 } else {
@@ -125,7 +127,9 @@ class LoginScreen extends StatelessWidget {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: Text("Error"),
-                        content: Text("Please enter a valid phone number."),
+                        content: Text(
+                          "Please enter a valid 10-digit phone number.",
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () {
@@ -250,13 +254,13 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  void _showLoginFailedDialog(BuildContext context) {
+  void _showLoginFailedDialog(BuildContext context, String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Login Failed"),
-          content: Text("Invalid email or password. Please try again."),
+          title: Text("Error"),
+          content: Text(message),
           actions: [
             TextButton(
               onPressed: () {
@@ -363,7 +367,10 @@ class LoginScreen extends StatelessWidget {
                         password == "password") {
                       Navigator.pushReplacementNamed(context, '/main');
                     } else {
-                      _showLoginFailedDialog(context);
+                      _showLoginFailedDialog(
+                        context,
+                        "Invalid email or password. Please try again.",
+                      );
                     }
                   },
                 ),
