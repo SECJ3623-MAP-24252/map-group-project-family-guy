@@ -7,6 +7,12 @@ class LoginScreen extends StatelessWidget {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController otpController = TextEditingController();
 
+  // Validate phone number
+  bool _isValidPhoneNumber(String phone) {
+    final RegExp phoneRegex = RegExp(r'^\d{10}$'); // 10-digit validation
+    return phoneRegex.hasMatch(phone);
+  }
+
   // Show reset password dialog
   void _showResetPasswordDialog(BuildContext context) {
     TextEditingController resetEmailController = TextEditingController();
@@ -36,7 +42,6 @@ class LoginScreen extends StatelessWidget {
               onPressed: () {
                 String email = resetEmailController.text.trim();
                 if (email.isNotEmpty) {
-                  // Simulate sending the password reset request
                   Navigator.pop(context);
                   _showResetPasswordSuccessDialog(context);
                 } else {
@@ -51,7 +56,6 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  // Show success message after resetting password
   void _showResetPasswordSuccessDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -72,7 +76,6 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  // Show error dialog
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,
@@ -122,25 +125,7 @@ class LoginScreen extends StatelessWidget {
                   Navigator.pop(context);
                   _showOtpDialog(context);
                 } else {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text("Error"),
-                        content: Text(
-                          "Please enter a valid 10-digit phone number.",
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text("OK"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  _showErrorDialog(context, "Please enter a valid 10-digit phone number.");
                 }
               },
               child: Text("Send OTP"),
@@ -179,23 +164,7 @@ class LoginScreen extends StatelessWidget {
                   Navigator.pop(context);
                   _showLoginSuccessDialog(context);
                 } else {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text("Error"),
-                        content: Text("Invalid OTP. Please try again."),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text("OK"),
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                  _showErrorDialog(context, "Invalid OTP. Please try again.");
                 }
               },
               child: Text("Verify OTP"),
@@ -343,8 +312,6 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20),
-
-              // Login button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -363,8 +330,7 @@ class LoginScreen extends StatelessWidget {
                     String email = emailController.text.trim();
                     String password = passwordController.text;
 
-                    if (email == "example@gmail.com" &&
-                        password == "password") {
+                    if (email == "example@gmail.com" && password == "password") {
                       Navigator.pushReplacementNamed(context, '/main');
                     } else {
                       _showLoginFailedDialog(
@@ -376,8 +342,6 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20),
-
-              // Phone login button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -398,8 +362,6 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20),
-
-              // Google login button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -420,8 +382,6 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 40),
-
-              // Register link
               Align(
                 alignment: Alignment.bottomCenter,
                 child: TextButton(
@@ -434,8 +394,6 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
-              // Reset password link
               Align(
                 alignment: Alignment.bottomCenter,
                 child: TextButton(
