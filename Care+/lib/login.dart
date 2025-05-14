@@ -1,10 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController otpController = TextEditingController();
+
+  // 邮箱格式验证
+  bool _isValidEmail(String email) {
+    RegExp emailRegex = RegExp(
+      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+    );
+    return emailRegex.hasMatch(email);
+  }
+
+  // 手机号码验证，确保为10位数
+  bool _isValidPhoneNumber(String phone) {
+    return phone.length == 10 && RegExp(r'^[0-9]+$').hasMatch(phone);
+  }
 
   void _showPhoneLoginDialog(BuildContext context) {
     showDialog(
@@ -30,7 +44,8 @@ class LoginScreen extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () {
-                if (phoneController.text.isNotEmpty) {
+                if (phoneController.text.isNotEmpty &&
+                    _isValidPhoneNumber(phoneController.text)) {
                   Navigator.pop(context);
                   _showOtpDialog(context);
                 } else {
@@ -39,7 +54,9 @@ class LoginScreen extends StatelessWidget {
                     builder: (BuildContext context) {
                       return AlertDialog(
                         title: Text("Error"),
-                        content: Text("Please enter a valid phone number."),
+                        content: Text(
+                          "Please enter a valid 10-digit phone number.",
+                        ),
                         actions: [
                           TextButton(
                             onPressed: () {
@@ -164,13 +181,13 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  void _showLoginFailedDialog(BuildContext context) {
+  void _showLoginFailedDialog(BuildContext context, String message) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Login Failed"),
-          content: Text("Invalid email or password. Please try again."),
+          title: Text("Error"),
+          content: Text(message),
           actions: [
             TextButton(
               onPressed: () {
@@ -273,11 +290,24 @@ class LoginScreen extends StatelessWidget {
                     String email = emailController.text.trim();
                     String password = passwordController.text;
 
-                    if (email == "example@google.com" &&
+                    if (email.isEmpty || password.isEmpty) {
+                      _showLoginFailedDialog(
+                        context,
+                        "Please enter both email and password.",
+                      );
+                    } else if (!_isValidEmail(email)) {
+                      _showLoginFailedDialog(
+                        context,
+                        "Please enter a valid email.",
+                      );
+                    } else if (email == "example@google.com" &&
                         password == "password") {
                       Navigator.pushReplacementNamed(context, '/main');
                     } else {
-                      _showLoginFailedDialog(context);
+                      _showLoginFailedDialog(
+                        context,
+                        "Invalid email or password. Please try again.",
+                      );
                     }
                   },
                 ),
