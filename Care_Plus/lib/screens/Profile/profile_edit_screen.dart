@@ -156,7 +156,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
         borderRadius: BorderRadius.all(Radius.circular(8)),
       ),
       enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.green.shade300, width: 1.5),
+        borderSide: BorderSide(color: Colors.teal.shade300, width: 1.5),
         borderRadius: const BorderRadius.all(Radius.circular(8)),
       ),
       errorBorder: const OutlineInputBorder(
@@ -230,7 +230,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                       children: [
                         CircleAvatar(
                           radius: 56,
-                          backgroundColor: Colors.green.shade100,
+                          backgroundColor: Colors.teal.shade100,
                           backgroundImage: _avatarImageFile != null
                               ? FileImage(_avatarImageFile!)
                               : const AssetImage(
@@ -245,7 +245,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.green.shade700.withOpacity(0.6),
+                                  color: Colors.teal.shade700.withOpacity(0.6),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -475,7 +475,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
                     backgroundColor: const Color(0xFF4CAF50),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
-                    shadowColor: Colors.green.shade700,
+                    shadowColor: Colors.teal.shade700,
                     elevation: 6,
                     animationDuration: const Duration(milliseconds: 250),
                   ),

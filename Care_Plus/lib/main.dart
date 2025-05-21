@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
 // using namespace to avoid clash
-import 'package:Care_Plus/screens/Home/homepage.dart' as home_page;
+import 'package:Care_Plus/screens/home/homepage.dart' as home_page;
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
-
 import 'package:Care_Plus/screens/Login/signup.dart';
 import 'package:Care_Plus/screens/Login/login.dart';
 import 'package:Care_Plus/screens/profile/profile_edit_screen.dart';
@@ -18,7 +17,7 @@ class CarePlusApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Care+ | Senior Health Monitor',
+      title: 'Care Plus| Senior Health Monitor',
       theme: ThemeData(
         primarySwatch: Colors.teal,
         scaffoldBackgroundColor: const Color(0xFFF1FDF4),
@@ -29,7 +28,7 @@ class CarePlusApp extends StatelessWidget {
       routes: {
         AppRoutes.signup: (context) => SignUpScreen(),
         AppRoutes.login: (context) => LoginScreen(),
-        AppRoutes.main: (context) => home_page.MainScreen(),
+        AppRoutes.main: (context) => home_page.HomeScreen(),
         AppRoutes.profile: (context) => profile_page.ProfileScreen(),
         AppRoutes.profileEdit: (context) {
           final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;

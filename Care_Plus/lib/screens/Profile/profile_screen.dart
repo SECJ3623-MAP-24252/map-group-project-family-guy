@@ -54,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     if (confirmed == true) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text("You have unlinked from $name. A notification was sent."),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.teal,
       ));
     }
   }
@@ -69,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: Colors.green.shade200.withOpacity(0.3),
+            color: Colors.teal.shade200.withOpacity(0.3),
             blurRadius: 10,
             offset: const Offset(0, 6),
           ),
@@ -87,7 +87,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           Text(
             "$label:",
             style: TextStyle(
-              color: Colors.green.shade700,
+              color: Colors.teal.shade700,
               fontWeight: FontWeight.w700,
               fontSize: fontSize,
             ),
@@ -117,7 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: titleSize,
-            color: Colors.green.shade900,
+            color: Colors.teal.shade900,
           ),
         ),
         const SizedBox(height: 10),
@@ -148,14 +148,14 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     final double infoFontSize = isSmallScreen ? 16 : 20;
 
     return Scaffold(
-      backgroundColor: Colors.green.shade50,
+      backgroundColor: Colors.teal.shade50,
       appBar: AppBar(
-        backgroundColor: Colors.green.shade600,
+        backgroundColor: Colors.teal.shade600,
         elevation: 0,
         title: Text(
           "Profile",
           style: TextStyle(
-            color: Colors.green.shade50,
+            color: Colors.teal.shade50,
             fontWeight: FontWeight.bold,
             fontSize: titleFontSize + 4,
           ),
@@ -180,7 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.green.shade200, width: 3),
+                  border: Border.all(color: Colors.teal.shade200, width: 3),
                 ),
                 child: CircleAvatar(
                   radius: 54,
@@ -194,16 +194,16 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 style: TextStyle(
                   fontSize: titleFontSize + 8,
                   fontWeight: FontWeight.w800,
-                  color: Colors.green.shade900,
+                  color: Colors.teal.shade900,
                 ),
               ),
               const SizedBox(height: 6),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Age: 65", style: TextStyle(color: Colors.green.shade800, fontSize: subtitleFontSize)),
+                  Text("Age: 65", style: TextStyle(color: Colors.teal.shade800, fontSize: subtitleFontSize)),
                   const SizedBox(width: 20),
-                  Text("Height: 170 cm", style: TextStyle(color: Colors.green.shade800, fontSize: subtitleFontSize)),
+                  Text("Height: 170 cm", style: TextStyle(color: Colors.teal.shade800, fontSize: subtitleFontSize)),
                   const SizedBox(width: 20),
                   Text("Weight: 65 kg", style: TextStyle(color: Colors.green.shade800, fontSize: subtitleFontSize)),
                 ],
@@ -250,7 +250,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               const SizedBox(height: 18),
 
               if (widget.isGuardian) ...[
-                Divider(color: Colors.green.shade300, thickness: 1.5),
+                Divider(color: Colors.teal.shade300, thickness: 1.5),
                 const SizedBox(height: 12),
                 Align(
                   alignment: Alignment.centerLeft,
@@ -259,7 +259,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: titleFontSize + 2,
-                      color: Colors.green.shade900,
+                      color: Colors.teal.shade900,
                     ),
                   ),
                 ),
@@ -270,7 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     borderRadius: BorderRadius.circular(14),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.green.shade200.withOpacity(0.3),
+                        color: Colors.teal.shade200.withOpacity(0.3),
                         blurRadius: 10,
                         offset: const Offset(0, 5),
                       ),
@@ -287,7 +287,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   ),
                 ),
               ] else ...[
-                Divider(color: Colors.green.shade300, thickness: 1.5),
+                Divider(color: Colors.teal.shade300, thickness: 1.5),
                 const SizedBox(height: 20),
                 Align(
                   alignment: Alignment.centerLeft,
@@ -296,7 +296,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: titleFontSize + 2,
-                      color: Colors.green.shade900,
+                      color: Colors.teal.shade900,
                     ),
                   ),
                 ),
