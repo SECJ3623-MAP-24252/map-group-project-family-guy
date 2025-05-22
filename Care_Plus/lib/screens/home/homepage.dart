@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
+import 'package:Care_Plus/screens/Home/ManageMedicineSchedule.dart';
 
 class HomeScreen extends StatelessWidget {
   final List<Map<String, dynamic>> features = [
@@ -37,13 +38,20 @@ class HomeScreen extends StatelessWidget {
     },
   ];
 
-  void _navigateToComingSoon(BuildContext context, String title) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ComingSoonPage(title: title),
-      ),
-    );
+  void _navigateToFeature(BuildContext context, String title) {
+    if (title == 'Add Medicine Reminder') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ManageMedicineSchedule()),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ComingSoonPage(title: title),
+        ),
+      );
+    }
   }
 
   void _navigateToSettings(BuildContext context) {
@@ -56,7 +64,7 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _logout(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/login'); // 确保你在 main.dart 注册了 '/login' 路由
+    Navigator.pushReplacementNamed(context, '/login');
   }
 
   @override
@@ -128,7 +136,7 @@ class HomeScreen extends StatelessWidget {
                     elevation: 4,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
-                      onTap: () => _navigateToComingSoon(context, item['title']),
+                      onTap: () => _navigateToFeature(context, item['title']),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Column(
