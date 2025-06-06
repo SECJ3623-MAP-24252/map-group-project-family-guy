@@ -1,41 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
 import 'package:Care_Plus/screens/Home/ManageMedicineSchedule.dart';
+import 'package:Care_Plus/screens/contact_relatives/contact_relatives_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   final List<Map<String, dynamic>> features = [
-    {
-      'title': 'Appointment Reminder',
-      'icon': Icons.calendar_today,
-    },
-    {
-      'title': 'Add Medicine Reminder',
-      'icon': Icons.medication_outlined,
-    },
-    {
-      'title': 'Locate Nearby Hospital',
-      'icon': Icons.local_hospital,
-    },
-    {
-      'title': 'Contact Relatives',
-      'icon': Icons.phone_in_talk,
-    },
-    {
-      'title': 'Emergency Location',
-      'icon': Icons.emergency_share,
-    },
-    {
-      'title': 'Documents',
-      'icon': Icons.description_outlined,
-    },
-    {
-      'title': 'Node',
-      'icon': Icons.device_hub,
-    },
-    {
-      'title': 'Relative',
-      'icon': Icons.group,
-    },
+    {'title': 'Appointment Reminder', 'icon': Icons.calendar_today},
+    {'title': 'Add Medicine Reminder', 'icon': Icons.medication_outlined},
+    {'title': 'Locate Nearby Hospital', 'icon': Icons.local_hospital},
+    {'title': 'Contact Relatives', 'icon': Icons.phone_in_talk},
+    {'title': 'Emergency Location', 'icon': Icons.emergency_share},
+    {'title': 'Documents', 'icon': Icons.description_outlined},
+    {'title': 'Node', 'icon': Icons.device_hub},
+    {'title': 'Relative', 'icon': Icons.group},
   ];
 
   void _navigateToFeature(BuildContext context, String title) {
@@ -44,12 +21,15 @@ class HomeScreen extends StatelessWidget {
         context,
         MaterialPageRoute(builder: (context) => const ManageMedicineSchedule()),
       );
+    } else if (title == 'Contact Relatives') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const ContactRelativesScreen()),
+      );
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => ComingSoonPage(title: title),
-        ),
+        MaterialPageRoute(builder: (context) => ComingSoonPage(title: title)),
       );
     }
   }
@@ -82,7 +62,9 @@ class HomeScreen extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => profile_page.ProfileScreen()),
+                MaterialPageRoute(
+                  builder: (context) => profile_page.ProfileScreen(),
+                ),
               );
             },
           ),
@@ -142,11 +124,7 @@ class HomeScreen extends StatelessWidget {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              item['icon'],
-                              size: 50,
-                              color: themeColor,
-                            ),
+                            Icon(item['icon'], size: 50, color: themeColor),
                             const SizedBox(height: 16),
                             Text(
                               item['title'],
