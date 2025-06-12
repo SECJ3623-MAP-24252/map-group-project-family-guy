@@ -30,7 +30,7 @@ class CarePlusApp extends StatelessWidget {
         AppRoutes.signup: (context) => SignUpScreen(),
         AppRoutes.login: (context) => LoginScreen(),
         AppRoutes.main: (context) => home_page.HomeScreen(),
-        AppRoutes.profi le: (context) => profile_page.ProfileScreen(),
+        AppRoutes.profile: (context) => profile_page.ProfileScreen(),
         AppRoutes.profileEdit: (context) {
           final args =
               ModalRoute.of(context)?.settings.arguments
