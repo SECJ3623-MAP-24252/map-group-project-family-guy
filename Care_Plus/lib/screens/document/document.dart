@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HealthDataPage extends StatefulWidget {
   final String? profileId;
@@ -37,7 +38,9 @@ class _HealthDataPageState extends State<HealthDataPage> {
   @override
   void initState() {
     super.initState();
-    if (widget.profileId != null) _loadProfile(widget.profileId!);
+    if (widget.profileId != null) {
+      _loadProfile(widget.profileId!);
+    }
   }
 
   Future<void> _loadProfile(String id) async {
@@ -60,6 +63,22 @@ class _HealthDataPageState extends State<HealthDataPage> {
     });
   }
 
+  Future<void> _loadLastProfile() async {
+    final snap =
+        await FirebaseFirestore.instance
+            .collection('profiles')
+            .orderBy('updatedAt', descending: true)
+            .limit(1)
+            .get();
+    if (snap.docs.isNotEmpty) {
+      final doc = snap.docs.first;
+      await _loadProfile(doc.id);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Loaded last submission')));
+    }
+  }
+
   Future<String> _uploadFile(File file, String path) async {
     final ref = FirebaseStorage.instance.ref().child(path);
     await ref.putFile(file);
@@ -75,8 +94,9 @@ class _HealthDataPageState extends State<HealthDataPage> {
           _docId ?? FirebaseFirestore.instance.collection('profiles').doc().id;
 
       String? photoUrl;
-      if (_photo != null)
+      if (_photo != null) {
         photoUrl = await _uploadFile(_photo!, 'profiles/$id/photo_$now.jpg');
+      }
 
       Future<List<String>> uploadList(List<File> list, String folder) async {
         return Future.wait(
@@ -121,7 +141,7 @@ class _HealthDataPageState extends State<HealthDataPage> {
     } catch (e) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Error: \$e')));
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -134,6 +154,13 @@ class _HealthDataPageState extends State<HealthDataPage> {
         title: const Text('Health Profile'),
         centerTitle: true,
         elevation: 2,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            tooltip: 'Load Last Submission',
+            onPressed: _isLoading ? null : _loadLastProfile,
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -147,6 +174,7 @@ class _HealthDataPageState extends State<HealthDataPage> {
                   child: Form(
                     key: _formKey,
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         _buildTextField('Name', _nameCtrl),
                         const SizedBox(height: 12),
@@ -331,9 +359,7 @@ class _HealthDataPageState extends State<HealthDataPage> {
                   icon: const Icon(Icons.upload_file),
                 ),
                 IconButton(
-                  onPressed: () {
-                    /*camera*/
-                  },
+                  onPressed: () {},
                   icon: const Icon(Icons.camera_alt),
                 ),
               ],
@@ -404,8 +430,10 @@ class _HealthDataPageState extends State<HealthDataPage> {
     }
   }
 
-  void _openUrl(String url) {
-    // TODO: implement url_launcher
+  Future<void> _openUrl(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    }
   }
 
   Future<void> _pickPhoto() async {
@@ -413,7 +441,9 @@ class _HealthDataPageState extends State<HealthDataPage> {
       source: ImageSource.camera,
       imageQuality: 80,
     );
-    if (img != null) setState(() => _photo = File(img.path));
+    if (img != null) {
+      setState(() => _photo = File(img.path));
+    }
   }
 
   Future<void> _pickFileByLabel(String label) async {
@@ -430,8 +460,6 @@ class _HealthDataPageState extends State<HealthDataPage> {
             break;
           case 'History Docs':
             _historyDocs.addAll(files);
-            break;
-          default:
             break;
         }
       });
