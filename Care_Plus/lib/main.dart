@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:Care_Plus/screens/Loading/loading.dart';
 import 'package:Care_Plus/screens/home/homepage.dart' as home_page;
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
@@ -13,6 +15,8 @@ import 'package:Care_Plus/screens/contact_relatives/contact_relatives_screen.dar
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(); // ← 在 runApp 之前完成初始化
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   runApp(const CarePlusApp());
 }
 

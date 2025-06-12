@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
 import 'package:Care_Plus/screens/Home/ManageMedicineSchedule.dart';
 import 'package:Care_Plus/screens/contact_relatives/contact_relatives_screen.dart';
+import 'package:Care_Plus/screens/hospital/hospital_map_screen.dart';
+
+
+
+              
+
+
 
 class oldHomeScreen extends StatelessWidget {
   final List<Map<String, dynamic>> features = [
@@ -21,7 +28,13 @@ class oldHomeScreen extends StatelessWidget {
         context,
         MaterialPageRoute(builder: (context) => const ManageMedicineSchedule()),
       );
-    } else if (title == 'Contact Relatives') {
+    } else if (title == 'Locate Nearby Hospital') {              // ★ 新增
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const HospitalMapScreen()),
+    );
+    }
+  else if (title == 'Contact Relatives') {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => const ContactRelativesScreen()),

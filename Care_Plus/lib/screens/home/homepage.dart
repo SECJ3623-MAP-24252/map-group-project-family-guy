@@ -4,6 +4,8 @@ import 'package:Care_Plus/screens/home/oldhomepage.dart';
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
 import 'package:Care_Plus/screens/appointment/appointment_page.dart'; // 路径请根据你实际项目调整
 import 'package:Care_Plus/screens/relative/chat.dart';
+import 'package:Care_Plus/screens/hospital/hospital_map_screen.dart';
+
 
 void main() {
   runApp(HomeScreen());
@@ -194,6 +196,17 @@ class WalletHomePage extends StatelessWidget {
                       );
                     },
                   ),
+
+                  actionButton(
+          Icons.map,
+      'Hospital',
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => HospitalMapScreen()),
+        );
+      },
+    ),
                   actionButton(
                     Icons.more_horiz,
                     'More',
