@@ -9,7 +9,8 @@ class ProfileScreen extends StatefulWidget {
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
+class _ProfileScreenState extends State<ProfileScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
 
@@ -41,21 +42,32 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   void _unlink(BuildContext context, String name) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Confirm Unlink"),
-        content: Text("Are you sure you want to unlink from $name?"),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Unlink")),
-        ],
-      ),
+      builder:
+          (_) => AlertDialog(
+            title: const Text("Confirm Unlink"),
+            content: Text("Are you sure you want to unlink from $name?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text("Unlink"),
+              ),
+            ],
+          ),
     );
 
     if (confirmed == true) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("You have unlinked from $name. A notification was sent."),
-        backgroundColor: Colors.teal,
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "You have unlinked from $name. A notification was sent.",
+          ),
+          backgroundColor: Colors.teal,
+        ),
+      );
     }
   }
 
@@ -108,7 +120,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     );
   }
 
-  Widget _infoBlock(String title, List<String> items, double titleSize, double itemSize) {
+  Widget _infoBlock(
+    String title,
+    List<String> items,
+    double titleSize,
+    double itemSize,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -121,17 +138,19 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           ),
         ),
         const SizedBox(height: 10),
-        ...items.map((item) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Text(
-            "• $item",
-            style: TextStyle(
-              fontSize: itemSize,
-              color: Colors.black87,
-              height: 1.4,
+        ...items.map(
+          (item) => Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Text(
+              "• $item",
+              style: TextStyle(
+                fontSize: itemSize,
+                color: Colors.black87,
+                height: 1.4,
+              ),
             ),
           ),
-        )),
+        ),
       ],
     );
   }
@@ -143,7 +162,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     // 响应式字体大小
     final bool isSmallScreen = screenWidth < 360;
     final double titleFontSize = isSmallScreen ? 18 : 22;
-    final double itemFontSize = isSmallScreen ? 16 : 20;
     final double subtitleFontSize = isSmallScreen ? 14 : 18;
     final double infoFontSize = isSmallScreen ? 16 : 20;
 
@@ -167,7 +185,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             icon: const Icon(Icons.edit, color: Colors.white),
             onPressed: () => _editProfile(context),
             tooltip: 'Edit Profile',
-          )
+          ),
         ],
       ),
       body: FadeTransition(
@@ -184,7 +202,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 ),
                 child: CircleAvatar(
                   radius: 54,
-                  backgroundImage: const AssetImage('assets/images/senior_profile.png'),
+                  backgroundImage: const AssetImage(
+                    'assets/images/senior_profile.png',
+                  ),
                   backgroundColor: Colors.transparent,
                 ),
               ),
@@ -201,11 +221,29 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Age: 65", style: TextStyle(color: Colors.teal.shade800, fontSize: subtitleFontSize)),
+                  Text(
+                    "Age: 65",
+                    style: TextStyle(
+                      color: Colors.teal.shade800,
+                      fontSize: subtitleFontSize,
+                    ),
+                  ),
                   const SizedBox(width: 20),
-                  Text("Height: 170 cm", style: TextStyle(color: Colors.teal.shade800, fontSize: subtitleFontSize)),
+                  Text(
+                    "Height: 170 cm",
+                    style: TextStyle(
+                      color: Colors.teal.shade800,
+                      fontSize: subtitleFontSize,
+                    ),
+                  ),
                   const SizedBox(width: 20),
-                  Text("Weight: 65 kg", style: TextStyle(color: Colors.green.shade800, fontSize: subtitleFontSize)),
+                  Text(
+                    "Weight: 65 kg",
+                    style: TextStyle(
+                      color: Colors.green.shade800,
+                      fontSize: subtitleFontSize,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 28),
@@ -224,19 +262,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
               _sectionCard(
                 width: screenWidth * 0.9,
-                child: _infoBlock("Allergies", ["Penicillin", "Peanuts"], titleFontSize, infoFontSize),
-              ),
-
-              _sectionCard(
-                width: screenWidth * 0.9,
-                child: _infoBlock("Medical History", ["Diabetes", "Hypertension"], titleFontSize, infoFontSize),
-              ),
-
-              _sectionCard(
-                width: screenWidth * 0.9,
                 child: _infoBlock(
-                  "Insurance & Family Doctor",
-                  ["Insurance: HealthPlus Basic", "Family Doctor: Dr. Lee Cheng"],
+                  "Allergies",
+                  ["Penicillin", "Peanuts"],
                   titleFontSize,
                   infoFontSize,
                 ),
@@ -244,7 +272,35 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
               _sectionCard(
                 width: screenWidth * 0.9,
-                child: _infoBlock("Emergency Contact", ["Jane Smith (+60198765432)"], titleFontSize, infoFontSize),
+                child: _infoBlock(
+                  "Medical History",
+                  ["Diabetes", "Hypertension"],
+                  titleFontSize,
+                  infoFontSize,
+                ),
+              ),
+
+              _sectionCard(
+                width: screenWidth * 0.9,
+                child: _infoBlock(
+                  "Insurance & Family Doctor",
+                  [
+                    "Insurance: HealthPlus Basic",
+                    "Family Doctor: Dr. Lee Cheng",
+                  ],
+                  titleFontSize,
+                  infoFontSize,
+                ),
+              ),
+
+              _sectionCard(
+                width: screenWidth * 0.9,
+                child: _infoBlock(
+                  "Emergency Contact",
+                  ["Jane Smith (+60198765432)"],
+                  titleFontSize,
+                  infoFontSize,
+                ),
               ),
 
               const SizedBox(height: 18),
@@ -277,10 +333,23 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     ],
                   ),
                   child: ListTile(
-                    title: Text("Grandma Mary", style: TextStyle(fontWeight: FontWeight.w700, fontSize: infoFontSize)),
-                    subtitle: Text("mary.senior@careplus.com", style: TextStyle(fontSize: infoFontSize - 2)),
+                    title: Text(
+                      "Grandma Mary",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: infoFontSize,
+                      ),
+                    ),
+                    subtitle: Text(
+                      "mary.senior@careplus.com",
+                      style: TextStyle(fontSize: infoFontSize - 2),
+                    ),
                     trailing: IconButton(
-                      icon: Icon(Icons.link_off, color: Colors.red.shade400, size: infoFontSize + 4),
+                      icon: Icon(
+                        Icons.link_off,
+                        color: Colors.red.shade400,
+                        size: infoFontSize + 4,
+                      ),
                       onPressed: () => _unlink(context, "Grandma Mary"),
                       tooltip: 'Unlink Grandma Mary',
                     ),

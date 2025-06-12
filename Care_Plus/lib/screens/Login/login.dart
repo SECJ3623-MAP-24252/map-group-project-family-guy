@@ -1,5 +1,9 @@
+// lib/screens/Login/login.dart
+//example@utm.my
+//123456
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -9,13 +13,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-  bool _isPasswordVisible = false;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isPasswordVisible = false;
+  bool _isLoading = false;
 
   // 验证邮箱格式
   bool _isValidEmail(String email) {
-    final RegExp emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
     return emailRegex.hasMatch(email);
   }
 
@@ -24,13 +28,13 @@ class _LoginScreenState extends State<LoginScreen> {
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: Text(title, style: TextStyle(fontSize: 22)),
-            content: Text(message, style: TextStyle(fontSize: 20)),
+          (_) => AlertDialog(
+            title: Text(title, style: const TextStyle(fontSize: 22)),
+            content: Text(message, style: const TextStyle(fontSize: 20)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text("OK", style: TextStyle(fontSize: 20)),
+                child: const Text("OK", style: TextStyle(fontSize: 20)),
               ),
             ],
           ),
@@ -39,18 +43,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // 密码重置弹窗
   void _showResetPasswordDialog() {
-    TextEditingController resetEmailController = TextEditingController();
-
+    final resetEmailController = TextEditingController();
     showDialog(
       context: context,
       builder:
-          (context) => AlertDialog(
-            title: Text("Reset Password", style: TextStyle(fontSize: 22)),
+          (_) => AlertDialog(
+            title: const Text("Reset Password", style: TextStyle(fontSize: 22)),
             content: TextFormField(
               controller: resetEmailController,
               keyboardType: TextInputType.emailAddress,
-              style: TextStyle(fontSize: 20),
-              decoration: InputDecoration(
+              style: const TextStyle(fontSize: 20),
+              decoration: const InputDecoration(
                 labelText: "Enter your email",
                 border: OutlineInputBorder(),
               ),
@@ -58,23 +61,33 @@ class _LoginScreenState extends State<LoginScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text("Cancel", style: TextStyle(fontSize: 18)),
+                child: const Text("Cancel", style: TextStyle(fontSize: 18)),
               ),
               ElevatedButton(
-                onPressed: () {
-                  String email = resetEmailController.text.trim();
+                onPressed: () async {
+                  final email = resetEmailController.text.trim();
                   if (_isValidEmail(email)) {
                     Navigator.pop(context);
-                    _showDialog(
-                      "Success",
-                      "Password reset link sent to $email.",
-                    );
+                    try {
+                      await FirebaseAuth.instance.sendPasswordResetEmail(
+                        email: email,
+                      );
+                      _showDialog(
+                        "Success",
+                        "Password reset link sent to $email.",
+                      );
+                    } on FirebaseAuthException catch (e) {
+                      _showDialog(
+                        "Error",
+                        e.message ?? "Failed to send reset email.",
+                      );
+                    }
                   } else {
                     _showDialog("Error", "Please enter a valid email address.");
                   }
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                child: Text(
+                child: const Text(
                   "Submit",
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
@@ -84,30 +97,39 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // 登录逻辑（含延迟）
-  void _login() async {
-    String email = emailController.text.trim();
-    String password = passwordController.text;
-
+  // 登录逻辑
+  Future<void> _login() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text;
     if (!_isValidEmail(email)) {
       _showDialog("Error", "Please enter a valid email address.");
-    } else if (password.length < 4) {
-      _showDialog("Error", "Password must be at least 4 characters long.");
-    } else {
-      if (email == "123456@123.com" && password == "123456") {
-        _showDialog("Success", "Login successful.");
-        await Future.delayed(Duration(seconds: 0));
-        Navigator.pushReplacementNamed(context, '/loading');
-      } else {
-        _showDialog("Error", "Invalid email or password.");
-      }
+      return;
+    }
+    if (password.length < 6) {
+      _showDialog("Error", "Password must be at least 6 characters long.");
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      // 登录成功后跳转
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/main');
+    } on FirebaseAuthException catch (e) {
+      _showDialog("Login Failed", e.message ?? "Unknown error");
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
+      const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.dark,
       ),
@@ -115,138 +137,130 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       backgroundColor: Colors.green.shade50,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final isSmallScreen = constraints.maxWidth < 600;
-
-          return SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-                child: Form(
-                  key: _formKey,
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: 500),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Image.asset(
-                          'assets/images/profile_avatar.png',
-                          width: 100,
-                          height: 100,
-                        ),
-                        SizedBox(height: 30),
-                        Text(
-                          'Welcome Back!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: isSmallScreen ? 26 : 34,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green.shade800,
-                          ),
-                        ),
-                        SizedBox(height: 40),
-                        TextFormField(
-                          controller: emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          style: TextStyle(fontSize: 20),
-                          decoration: InputDecoration(
-                            labelText: "Email",
-                            labelStyle: TextStyle(fontSize: 18),
-                            prefixIcon: Icon(Icons.email, color: Colors.green),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        TextFormField(
-                          controller: passwordController,
-                          obscureText: !_isPasswordVisible,
-                          style: TextStyle(fontSize: 20),
-                          decoration: InputDecoration(
-                            labelText: "Password",
-                            labelStyle: TextStyle(fontSize: 18),
-                            prefixIcon: Icon(Icons.lock, color: Colors.green),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _isPasswordVisible
-                                    ? Icons.visibility
-                                    : Icons.visibility_off,
-                                color: Colors.green,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _isPasswordVisible = !_isPasswordVisible;
-                                });
-                              },
-                            ),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                        ),
-                        SizedBox(height: 30),
-                        AnimatedContainer(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              padding: EdgeInsets.symmetric(vertical: 18),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              elevation: 5,
-                              shadowColor: Colors.greenAccent,
-                            ),
-                            onPressed: _login,
-                            child: Text(
-                              "Login",
-                              style: TextStyle(
-                                fontSize: 22,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        TextButton(
-                          onPressed: _showResetPasswordDialog,
-                          child: Text(
-                            "Forgot password?",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.green.shade800,
-                            ),
-                          ),
-                        ),
-                        TextButton(
-                          onPressed:
-                              () => Navigator.pushReplacementNamed(
-                                context,
-                                '/signup',
-                              ),
-                          child: Text(
-                            "Don't have an account? Register",
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.green.shade800,
-                            ),
-                          ),
-                        ),
-                      ],
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: Form(
+              key: _formKey,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Image.asset(
+                      'assets/images/profile_avatar.png',
+                      width: 100,
+                      height: 100,
                     ),
-                  ),
+                    const SizedBox(height: 30),
+                    Text(
+                      'Welcome Back!',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize:
+                            MediaQuery.of(context).size.width < 600 ? 26 : 34,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade800,
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    TextFormField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      style: const TextStyle(fontSize: 20),
+                      decoration: InputDecoration(
+                        labelText: "Email",
+                        labelStyle: const TextStyle(fontSize: 18),
+                        prefixIcon: const Icon(
+                          Icons.email,
+                          color: Colors.green,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      controller: passwordController,
+                      obscureText: !_isPasswordVisible,
+                      style: const TextStyle(fontSize: 20),
+                      decoration: InputDecoration(
+                        labelText: "Password",
+                        labelStyle: const TextStyle(fontSize: 18),
+                        prefixIcon: const Icon(Icons.lock, color: Colors.green),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                            color: Colors.green,
+                          ),
+                          onPressed:
+                              () => setState(
+                                () => _isPasswordVisible = !_isPasswordVisible,
+                              ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    _isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 5,
+                            shadowColor: Colors.greenAccent,
+                          ),
+                          onPressed: _login,
+                          child: const Text(
+                            "Login",
+                            style: TextStyle(fontSize: 22, color: Colors.white),
+                          ),
+                        ),
+                    const SizedBox(height: 20),
+                    TextButton(
+                      onPressed: _showResetPasswordDialog,
+                      child: Text(
+                        "Forgot password?",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.green.shade800,
+                        ),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed:
+                          () => Navigator.pushReplacementNamed(
+                            context,
+                            '/signup',
+                          ),
+                      child: Text(
+                        "Don't have an account? Register",
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.green.shade800,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }

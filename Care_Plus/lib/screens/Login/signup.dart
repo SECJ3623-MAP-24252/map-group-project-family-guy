@@ -1,4 +1,8 @@
+// lib/screens/Login/signup.dart
+
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -11,13 +15,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   final TextEditingController contactNumberController = TextEditingController();
-  final TextEditingController existingConditionsController = TextEditingController();
+  final TextEditingController existingConditionsController =
+      TextEditingController();
   final TextEditingController allergiesController = TextEditingController();
   final TextEditingController medicationsController = TextEditingController();
   final TextEditingController seniorIdController = TextEditingController();
-  final TextEditingController customRelationshipController = TextEditingController();
+  final TextEditingController customRelationshipController =
+      TextEditingController();
 
   String? selectedRole;
   String? selectedRelationship;
@@ -25,18 +32,113 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
 
   final List<String> roles = ['Senior', 'Guardian'];
-  final List<String> relationships = ['Spouse', 'Child', 'Sibling', 'Friend', 'Caregiver', 'Other'];
+  final List<String> relationships = [
+    'Spouse',
+    'Child',
+    'Sibling',
+    'Friend',
+    'Caregiver',
+    'Other',
+  ];
   final List<String> conditions = [
-    'Diabetes', 'Hypertension', 'Arthritis', 'Heart Disease', 'Dementia', 'Parkinson\'s',
-    'Stroke', 'Asthma', 'Osteoporosis', 'Cancer', 'Other'
+    'Diabetes',
+    'Hypertension',
+    'Arthritis',
+    'Heart Disease',
+    'Dementia',
+    'Parkinson\'s',
+    'Stroke',
+    'Asthma',
+    'Osteoporosis',
+    'Cancer',
+    'Other',
   ];
 
-  void handleSignUp() {
-    if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Sign-up successful!")));
+  // 显示对话框
+  void _showDialog(String title, String message) {
+    showDialog(
+      context: context,
+      builder:
+          (_) => AlertDialog(
+            title: Text(title, style: const TextStyle(fontSize: 22)),
+            content: Text(message, style: const TextStyle(fontSize: 20)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("OK", style: TextStyle(fontSize: 18)),
+              ),
+            ],
+          ),
+    );
+  }
+
+  // 注册并写入 Firestore
+  Future<void> handleSignUp() async {
+    if (!_formKey.currentState!.validate() || selectedRole == null) {
+      _showDialog("Error", "请完整填写所有必填项");
+      return;
+    }
+
+    if (passwordController.text != confirmPasswordController.text) {
+      _showDialog("Error", "两次输入的密码不一致");
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // 1. 创建 Firebase Auth 用户
+      UserCredential userCred = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text,
+          );
+
+      String uid = userCred.user!.uid;
+
+      // 2. 将用户信息写入 Firestore
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'uid': uid,
+        'name': nameController.text.trim(),
+        'email': emailController.text.trim(),
+        'role': selectedRole,
+        'contactNumber': contactNumberController.text.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
+        // Guardian 专属
+        if (selectedRole == 'Guardian') ...{
+          'seniorId': seniorIdController.text.trim(),
+          'relationship':
+              selectedRelationship == 'Other'
+                  ? customRelationshipController.text.trim()
+                  : selectedRelationship,
+        },
+        // Senior 专属
+        if (selectedRole == 'Senior') ...{
+          'existingCondition':
+              selectedCondition == 'Other'
+                  ? existingConditionsController.text.trim()
+                  : selectedCondition,
+          'allergies': allergiesController.text.trim(),
+          'medications': medicationsController.text.trim(),
+        },
+      });
+
+      // 注册成功，跳转登录
+      if (!mounted) return;
+      _showDialog("Success", "注册成功，请登录");
       Navigator.pushReplacementNamed(context, '/login');
+    } on FirebaseAuthException catch (e) {
+      _showDialog("注册失败", e.message ?? "未知错误");
+    } finally {
+      if (mounted)
+        setState(() {
+          _isLoading = false;
+        });
     }
   }
 
@@ -50,7 +152,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
         prefixIcon: Icon(icon, size: 28),
         labelStyle: TextStyle(fontSize: baseFontSize),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 16,
+          horizontal: 20,
+        ),
       );
     }
 
@@ -58,191 +163,259 @@ class _SignUpScreenState extends State<SignUpScreen> {
       backgroundColor: Colors.green[50],
       appBar: AppBar(
         backgroundColor: Colors.green[700],
-        title: Text("CARE PLUS REGISTER", style: TextStyle(fontSize: baseFontSize + 4)),
+        title: Text(
+          "CARE PLUS REGISTER",
+          style: TextStyle(fontSize: baseFontSize + 4),
+        ),
         centerTitle: true,
       ),
-      body: LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          padding: EdgeInsets.all(20),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                DropdownButtonFormField<String>(
-                  value: selectedRole,
-                  items: roles.map((role) {
-                    return DropdownMenuItem(value: role, child: Text(role, style: TextStyle(fontSize: baseFontSize)));
-                  }).toList(),
-                  onChanged: (value) => setState(() => selectedRole = value),
-                  decoration: _decoration("Select Role", Icons.person),
-                  validator: (value) => value == null ? 'Please select a role' : null,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // 角色选择
+              DropdownButtonFormField<String>(
+                value: selectedRole,
+                items:
+                    roles
+                        .map(
+                          (r) => DropdownMenuItem(
+                            value: r,
+                            child: Text(
+                              r,
+                              style: TextStyle(fontSize: baseFontSize),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                onChanged: (v) => setState(() => selectedRole = v),
+                decoration: _decoration("Select Role", Icons.person),
+                validator: (v) => v == null ? '请选择角色' : null,
+              ),
+              const SizedBox(height: 15),
+
+              // 通用字段
+              TextFormField(
+                controller: nameController,
+                decoration: _decoration("Full Name", Icons.person_outline),
+                validator: (v) => v == null || v.isEmpty ? '请输入姓名' : null,
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: _decoration("Email", Icons.email_outlined),
+                validator:
+                    (v) => v != null && v.contains('@') ? null : '请输入有效邮箱',
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: passwordController,
+                obscureText: _obscurePassword,
+                decoration: _decoration(
+                  "Password",
+                  Icons.lock_outline,
+                ).copyWith(
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                    onPressed:
+                        () => setState(
+                          () => _obscurePassword = !_obscurePassword,
+                        ),
+                  ),
                 ),
-                SizedBox(height: 15),
+                validator:
+                    (v) => v != null && v.length >= 6 ? null : '密码最少 6 位',
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: confirmPasswordController,
+                obscureText: _obscureConfirmPassword,
+                decoration: _decoration(
+                  "Confirm Password",
+                  Icons.lock_outline,
+                ).copyWith(
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureConfirmPassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                    ),
+                    onPressed:
+                        () => setState(
+                          () =>
+                              _obscureConfirmPassword =
+                                  !_obscureConfirmPassword,
+                        ),
+                  ),
+                ),
+                validator:
+                    (v) => v == passwordController.text ? null : '两次密码不一致',
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: contactNumberController,
+                keyboardType: TextInputType.phone,
+                decoration: _decoration("Contact Number", Icons.phone),
+                validator: (v) {
+                  if (v == null || v.isEmpty) return '请输入联系电话';
+                  if (!RegExp(r'^\+?[0-9]{10,15}$').hasMatch(v))
+                    return '请输入有效号码';
+                  return null;
+                },
+              ),
 
-                _buildTextField(nameController, "Full Name", Icons.person_outline, baseFontSize),
-                _buildTextField(emailController, "Email", Icons.email_outlined, baseFontSize,
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) => value != null && value.contains('@') ? null : 'Enter a valid email'),
+              // Guardian 专属
+              if (selectedRole == "Guardian") ...[
+                const SizedBox(height: 15),
+                TextFormField(
+                  controller: seniorIdController,
+                  decoration: _decoration("Senior ID", Icons.qr_code),
+                  validator:
+                      (v) => v == null || v.isEmpty ? '请输入被监护人 ID' : null,
+                ),
+                const SizedBox(height: 10),
+                DropdownButtonFormField<String>(
+                  value: selectedRelationship,
+                  items:
+                      relationships
+                          .map(
+                            (r) => DropdownMenuItem(
+                              value: r,
+                              child: Text(
+                                r,
+                                style: TextStyle(fontSize: baseFontSize),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                  onChanged:
+                      (v) => setState(() {
+                        selectedRelationship = v;
+                        if (v != 'Other') customRelationshipController.clear();
+                      }),
+                  decoration: _decoration("Select Relationship", Icons.link),
+                  validator: (v) => v == null ? '请选择关系' : null,
+                ),
+                if (selectedRelationship == "Other")
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: TextFormField(
+                      controller: customRelationshipController,
+                      decoration: _decoration(
+                        "Custom Relationship",
+                        Icons.text_fields,
+                      ),
+                      validator:
+                          (v) => v == null || v.isEmpty ? '请输入自定义关系' : null,
+                    ),
+                  ),
+              ],
 
-                _buildPasswordField(passwordController, "Password", Icons.lock_outline, baseFontSize, _obscurePassword, () {
-                  setState(() => _obscurePassword = !_obscurePassword);
-                }),
-                _buildPasswordField(confirmPasswordController, "Confirm Password", Icons.lock_outline, baseFontSize,
-                    _obscureConfirmPassword, () {
-                      setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
-                    }, validator: (value) => value == passwordController.text ? null : 'Passwords do not match'),
+              // Senior 专属
+              if (selectedRole == "Senior") ...[
+                const SizedBox(height: 15),
+                DropdownButtonFormField<String>(
+                  value: selectedCondition,
+                  items:
+                      conditions
+                          .map(
+                            (c) => DropdownMenuItem(
+                              value: c,
+                              child: Text(
+                                c,
+                                style: TextStyle(fontSize: baseFontSize),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                  onChanged: (v) => setState(() => selectedCondition = v),
+                  decoration: _decoration(
+                    "Select Existing Condition",
+                    Icons.medical_services,
+                  ),
+                  validator: (v) => v == null ? '请选择病史' : null,
+                ),
+                if (selectedCondition == "Other")
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: TextFormField(
+                      controller: existingConditionsController,
+                      decoration: _decoration(
+                        "Other Condition",
+                        Icons.text_fields,
+                      ),
+                      validator:
+                          (v) => v == null || v.isEmpty ? '请输入病史详情' : null,
+                    ),
+                  ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: allergiesController,
+                  decoration: _decoration("Allergies", Icons.warning),
+                  validator: (v) => v == null ? '请输入过敏信息' : null,
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: medicationsController,
+                  decoration: _decoration(
+                    "Medications",
+                    Icons.medical_services,
+                  ),
+                  validator: (v) => v == null ? '请输入用药信息' : null,
+                ),
+              ],
 
-                _buildTextField(contactNumberController, "Contact Number", Icons.phone, baseFontSize,
-                    keyboardType: TextInputType.phone,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) return 'Contact number is required';
-                      if (!RegExp(r'^\+?[0-9]{10,15}$').hasMatch(value)) return 'Enter valid number';
-                      return null;
-                    }),
+              const SizedBox(height: 30),
 
-                if (selectedRole == "Guardian") ..._buildGuardianFields(baseFontSize),
-                if (selectedRole == "Senior") ..._buildSeniorFields(baseFontSize),
-
-                SizedBox(height: 30),
-
-                InkWell(
-                  onTap: handleSignUp,
-                  borderRadius: BorderRadius.circular(12),
-                  splashColor: Colors.white,
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 200),
-                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 32),
-                    decoration: BoxDecoration(
-                      color: Colors.green[600],
-                      borderRadius: BorderRadius.circular(12),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                    onPressed: handleSignUp,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green[600],
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 32,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.person_add, color: Colors.white),
-                        SizedBox(width: 10),
-                        Text("Register", style: TextStyle(color: Colors.white, fontSize: baseFontSize + 2)),
+                        const Icon(Icons.person_add, color: Colors.white),
+                        const SizedBox(width: 10),
+                        Text(
+                          "Register",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: baseFontSize + 2,
+                          ),
+                        ),
                       ],
                     ),
                   ),
+
+              TextButton(
+                onPressed:
+                    () => Navigator.pushReplacementNamed(context, '/login'),
+                child: Text(
+                  "Already have an account? Login",
+                  style: TextStyle(fontSize: baseFontSize),
                 ),
-
-                TextButton(
-                  onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
-                  child: Text("Already have an account? Login", style: TextStyle(fontSize: baseFontSize)),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon, double fontSize,
-      {TextInputType? keyboardType, String? Function(String?)? validator}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon, size: 28),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-          labelStyle: TextStyle(fontSize: fontSize),
-        ),
-        style: TextStyle(fontSize: fontSize),
-        keyboardType: keyboardType,
-        validator: validator ?? (value) => value == null || value.isEmpty ? '$label is required' : null,
-      ),
-    );
-  }
-
-  Widget _buildPasswordField(TextEditingController controller, String label, IconData icon, double fontSize,
-      bool obscure, VoidCallback toggle, {String? Function(String?)? validator}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: TextFormField(
-        controller: controller,
-        obscureText: obscure,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: Icon(icon, size: 28),
-          suffixIcon: IconButton(icon: Icon(obscure ? Icons.visibility_off : Icons.visibility), onPressed: toggle),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-          labelStyle: TextStyle(fontSize: fontSize),
-        ),
-        style: TextStyle(fontSize: fontSize),
-        validator: validator ?? (value) => value == null || value.length < 6 ? 'Min 6 characters' : null,
-      ),
-    );
-  }
-
-  List<Widget> _buildGuardianFields(double fontSize) {
-    return [
-      SizedBox(height: 15),
-      _buildTextField(seniorIdController, "Senior ID", Icons.qr_code, fontSize),
-      DropdownButtonFormField<String>(
-        value: selectedRelationship,
-        items: relationships.map((relation) {
-          return DropdownMenuItem(value: relation, child: Text(relation, style: TextStyle(fontSize: fontSize)));
-        }).toList(),
-        onChanged: (value) {
-          setState(() {
-            selectedRelationship = value;
-            if (selectedRelationship == "Other") {
-              customRelationshipController.text = '';
-            }
-          });
-        },
-        decoration: InputDecoration(
-          labelText: "Select Relationship",
-          prefixIcon: Icon(Icons.link),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-        validator: (value) => value == null ? 'Please select a relationship' : null,
-      ),
-      if (selectedRelationship == "Other")
-        _buildTextField(customRelationshipController, "Custom Relationship", Icons.text_fields, fontSize),
-    ];
-  }
-
-  List<Widget> _buildSeniorFields(double fontSize) {
-    return [
-      SizedBox(height: 20),
-      Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Medical History", style: TextStyle(fontSize: fontSize + 2, fontWeight: FontWeight.bold, color: Colors.green[800])),
-              Divider(),
-              DropdownButtonFormField<String>(
-                value: selectedCondition,
-                items: conditions.map((condition) {
-                  return DropdownMenuItem(value: condition, child: Text(condition, style: TextStyle(fontSize: fontSize)));
-                }).toList(),
-                onChanged: (value) => setState(() => selectedCondition = value),
-                decoration: InputDecoration(
-                  labelText: "Select Existing Condition",
-                  prefixIcon: Icon(Icons.medical_services),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                validator: (value) => value == null ? 'Please select a condition' : null,
               ),
-              if (selectedCondition == 'Other')
-                _buildTextField(existingConditionsController, "Other Condition", Icons.text_fields, fontSize),
-              _buildTextField(allergiesController, "Allergies", Icons.warning, fontSize),
-              _buildTextField(medicationsController, "Medications", Icons.medical_services, fontSize),
             ],
           ),
         ),
-      )
-    ];
+      ),
+    );
   }
 }

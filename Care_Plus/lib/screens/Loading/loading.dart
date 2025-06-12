@@ -1,4 +1,4 @@
-import 'package:Care_Plus/screens/home/homepage.dart';
+import 'package:Care_Plus/screens/Login/login.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -17,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Timer(Duration(seconds: 1), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+        MaterialPageRoute(builder: (context) => LoginScreen()),
       );
     });
   }
