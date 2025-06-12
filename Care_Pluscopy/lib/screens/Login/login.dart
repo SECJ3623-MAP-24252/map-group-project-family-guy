@@ -23,16 +23,17 @@ class _LoginScreenState extends State<LoginScreen> {
   void _showDialog(String title, String message) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title, style: TextStyle(fontSize: 22)),
-        content: Text(message, style: TextStyle(fontSize: 20)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("OK", style: TextStyle(fontSize: 20)),
-          )
-        ],
-      ),
+      builder:
+          (context) => AlertDialog(
+            title: Text(title, style: TextStyle(fontSize: 22)),
+            content: Text(message, style: TextStyle(fontSize: 20)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("OK", style: TextStyle(fontSize: 20)),
+              ),
+            ],
+          ),
     );
   }
 
@@ -42,37 +43,44 @@ class _LoginScreenState extends State<LoginScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text("Reset Password", style: TextStyle(fontSize: 22)),
-        content: TextFormField(
-          controller: resetEmailController,
-          keyboardType: TextInputType.emailAddress,
-          style: TextStyle(fontSize: 20),
-          decoration: InputDecoration(
-            labelText: "Enter your email",
-            border: OutlineInputBorder(),
+      builder:
+          (context) => AlertDialog(
+            title: Text("Reset Password", style: TextStyle(fontSize: 22)),
+            content: TextFormField(
+              controller: resetEmailController,
+              keyboardType: TextInputType.emailAddress,
+              style: TextStyle(fontSize: 20),
+              decoration: InputDecoration(
+                labelText: "Enter your email",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Cancel", style: TextStyle(fontSize: 18)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  String email = resetEmailController.text.trim();
+                  if (_isValidEmail(email)) {
+                    Navigator.pop(context);
+                    _showDialog(
+                      "Success",
+                      "Password reset link sent to $email.",
+                    );
+                  } else {
+                    _showDialog("Error", "Please enter a valid email address.");
+                  }
+                },
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                child: Text(
+                  "Submit",
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text("Cancel", style: TextStyle(fontSize: 18)),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              String email = resetEmailController.text.trim();
-              if (_isValidEmail(email)) {
-                Navigator.pop(context);
-                _showDialog("Success", "Password reset link sent to $email.");
-              } else {
-                _showDialog("Error", "Please enter a valid email address.");
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-            child: Text("Submit", style: TextStyle(fontSize: 18, color: Colors.white)),
-          ),
-        ],
-      ),
     );
   }
 
@@ -88,8 +96,8 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       if (email == "123456@123.com" && password == "123456") {
         _showDialog("Success", "Login successful.");
-        await Future.delayed(Duration(seconds: 1));
-        Navigator.pushReplacementNamed(context, '/main');
+        await Future.delayed(Duration(seconds: 0));
+        Navigator.pushReplacementNamed(context, '/loading');
       } else {
         _showDialog("Error", "Invalid email or password.");
       }
@@ -98,10 +106,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+      ),
+    );
 
     return Scaffold(
       backgroundColor: Colors.green.shade50,
@@ -120,7 +130,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Icon(Icons.account_circle, size: 100, color: Colors.green.shade700),
+                        Image.asset(
+                          'assets/images/profile_avatar.png',
+                          width: 100,
+                          height: 100,
+                        ),
                         SizedBox(height: 30),
                         Text(
                           'Welcome Back!',
@@ -140,7 +154,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             labelText: "Email",
                             labelStyle: TextStyle(fontSize: 18),
                             prefixIcon: Icon(Icons.email, color: Colors.green),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                             filled: true,
                             fillColor: Colors.white,
                           ),
@@ -156,7 +172,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             prefixIcon: Icon(Icons.lock, color: Colors.green),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                                _isPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
                                 color: Colors.green,
                               ),
                               onPressed: () {
@@ -165,7 +183,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 });
                               },
                             ),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                             filled: true,
                             fillColor: Colors.white,
                           ),
@@ -187,7 +207,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: _login,
                             child: Text(
                               "Login",
-                              style: TextStyle(fontSize: 22, color: Colors.white),
+                              style: TextStyle(
+                                fontSize: 22,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -196,14 +219,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: _showResetPasswordDialog,
                           child: Text(
                             "Forgot password?",
-                            style: TextStyle(fontSize: 18, color: Colors.green.shade800),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.green.shade800,
+                            ),
                           ),
                         ),
                         TextButton(
-                          onPressed: () => Navigator.pushReplacementNamed(context, '/signup'),
+                          onPressed:
+                              () => Navigator.pushReplacementNamed(
+                                context,
+                                '/signup',
+                              ),
                           child: Text(
                             "Don't have an account? Register",
-                            style: TextStyle(fontSize: 18, color: Colors.green.shade800),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.green.shade800,
+                            ),
                           ),
                         ),
                       ],

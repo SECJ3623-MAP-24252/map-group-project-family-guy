@@ -3,7 +3,7 @@ import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
 import 'package:Care_Plus/screens/Home/ManageMedicineSchedule.dart';
 import 'package:Care_Plus/screens/contact_relatives/contact_relatives_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class oldHomeScreen extends StatelessWidget {
   final List<Map<String, dynamic>> features = [
     {'title': 'Appointment Reminder', 'icon': Icons.calendar_today},
     {'title': 'Add Medicine Reminder', 'icon': Icons.medication_outlined},
