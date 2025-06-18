@@ -1,15 +1,11 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
-
-// 这里假设你有一个 ProfileTextBox 组件，如果没有，可以直接用 TextFormField 替代
-//import 'ProfileTextBox.dart';
+import 'package:Care_Plus/widgets/profile_text_box.dart';
 
 class ProfileEditScreen extends StatefulWidget {
   final bool isGuardian;
-
   const ProfileEditScreen({Key? key, this.isGuardian = false}) : super(key: key);
 
   @override
@@ -29,10 +25,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   final _weightController = TextEditingController();
   final _otherInsuranceController = TextEditingController();
   final _familyDoctorController = TextEditingController(text: "Dr. Smith");
-  final _emergencyContactController = TextEditingController(
-      text: "Jane Doe (+60198765432)");
-  final _medicalController = TextEditingController(
-      text: "Diabetes, Hypertension");
+  final _emergencyContactController = TextEditingController(text: "Jane Doe (+60198765432)");
+  final _medicalController = TextEditingController(text: "Diabetes, Hypertension");
   final _allergyController = TextEditingController();
 
   DateTime? _selectedDOB;
@@ -41,14 +35,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   File? _avatarImageFile;
   final ImagePicker _picker = ImagePicker();
 
-  final List<String> _insuranceOptions = [
-    'AIA',
-    'Great Eastern',
-    'Prudential',
-    'Etiqa',
-    'AXA',
-    'Others',
-  ];
+  final List<String> _insuranceOptions = ['AIA', 'Great Eastern', 'Prudential', 'Etiqa', 'AXA', 'Others'];
 
   bool _showEditIcon = false;
 
@@ -71,12 +58,7 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   }
 
   Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 600,
-      maxHeight: 600,
-    );
-
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery, maxWidth: 600, maxHeight: 600);
     if (pickedFile != null) {
       setState(() {
         _avatarImageFile = File(pickedFile.path);
@@ -85,33 +67,21 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   }
 
   void _pickDOB() async {
-    DateTime initialDate = _selectedDOB ?? DateTime(1950);
-    DateTime firstDate = DateTime(1900);
-    DateTime lastDate = DateTime.now();
-
     final picked = await showDatePicker(
       context: context,
-      initialDate: initialDate,
-      firstDate: firstDate,
-      lastDate: lastDate,
-      builder: (context, child) {
-        // 绿色主题
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: const Color(0xFF4CAF50), // header background
-              onPrimary: Colors.white, // header text color
-              onSurface: Colors.black87, // body text color
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF4CAF50), // button text color
-              ),
-            ),
+      initialDate: _selectedDOB ?? DateTime(1950),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.light(
+            primary: Color(0xFF4CAF50),
+            onPrimary: Colors.white,
+            onSurface: Colors.black,
           ),
-          child: child!,
-        );
-      },
+        ),
+        child: child!,
+      ),
     );
 
     if (picked != null) {
@@ -124,10 +94,9 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   }
 
   int _calculateAge(DateTime birthDate) {
-    DateTime today = DateTime.now();
-    int age = today.year - birthDate.year;
-    if (today.month < birthDate.month ||
-        (today.month == birthDate.month && today.day < birthDate.day)) {
+    final now = DateTime.now();
+    int age = now.year - birthDate.year;
+    if (now.month < birthDate.month || (now.month == birthDate.month && now.day < birthDate.day)) {
       age--;
     }
     return age;
@@ -135,51 +104,55 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
 
   void _save() {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Profile updated successfully."),
-        backgroundColor: Color(0xFF4CAF50),
-      ));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Profile updated successfully"), backgroundColor: Color(0xFF4CAF50)),
+      );
       Navigator.pop(context);
     }
   }
 
-  InputDecoration _inputDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: const TextStyle(
-        fontSize: 20,
-        color: Color(0xFF4CAF50),
-        fontWeight: FontWeight.w600,
+  Widget _avatarPicker() {
+    return Center(
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _showEditIcon = true),
+        onExit: (_) => setState(() => _showEditIcon = false),
+        child: GestureDetector(
+          onTap: _pickImage,
+          child: Stack(
+            alignment: Alignment.bottomRight,
+            children: [
+              CircleAvatar(
+                radius: 56,
+                backgroundColor: Colors.teal.shade100,
+                backgroundImage: _avatarImageFile != null
+                    ? FileImage(_avatarImageFile!)
+                    : const AssetImage('assets/images/profile_avatar.png') as ImageProvider,
+              ),
+              AnimatedOpacity(
+                opacity: _showEditIcon ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 300),
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF4CAF50),
+                    shape: BoxShape.circle,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: const Icon(Icons.edit, color: Colors.white, size: 24),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      focusedBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: Color(0xFF4CAF50), width: 2),
-        borderRadius: BorderRadius.all(Radius.circular(8)),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.teal.shade300, width: 1.5),
-        borderRadius: const BorderRadius.all(Radius.circular(8)),
-      ),
-      errorBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.redAccent, width: 2),
-        borderRadius: BorderRadius.all(Radius.circular(8)),
-      ),
-      focusedErrorBorder: const OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.redAccent, width: 2),
-        borderRadius: BorderRadius.all(Radius.circular(8)),
-      ),
-      contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
     );
   }
 
-  Widget _buildCard({required Widget child}) {
+  Widget _buildCard(Widget child) {
     return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-        child: child,
-      ),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: Padding(padding: const EdgeInsets.all(12), child: child),
     );
   }
 
@@ -187,303 +160,75 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
   Widget build(BuildContext context) {
     final isGuardian = widget.isGuardian;
 
-    // 响应式字体大小适配
-    final screenWidth = MediaQuery
-        .of(context)
-        .size
-        .width;
-    final bool isSmallScreen = screenWidth < 360;
-    final double labelFontSize = isSmallScreen ? 18 : 20;
-    final double inputFontSize = isSmallScreen ? 18 : 20;
-
     return Scaffold(
       backgroundColor: const Color(0xFFF1FDF4),
       appBar: AppBar(
-        title: const Text(
-          "Edit Profile",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-        ),
         backgroundColor: const Color(0xFF4CAF50),
-        elevation: 4,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.check, size: 28),
-            tooltip: 'Save',
-            onPressed: _save,
-          ),
-        ],
+        title: const Text("Edit Profile", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+        actions: [IconButton(onPressed: _save, icon: const Icon(Icons.check))],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              Center(
-                child: MouseRegion(
-                  onEnter: (_) => setState(() => _showEditIcon = true),
-                  onExit: (_) => setState(() => _showEditIcon = false),
-                  child: GestureDetector(
-                    onTap: _pickImage,
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        CircleAvatar(
-                          radius: 56,
-                          backgroundColor: Colors.teal.shade100,
-                          backgroundImage: _avatarImageFile != null
-                              ? FileImage(_avatarImageFile!)
-                              : const AssetImage(
-                              'assets/images/profile_avatar.png') as ImageProvider,
-                        ),
-                        AnimatedOpacity(
-                          opacity: _showEditIcon ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 300),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF4CAF50),
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.teal.shade700.withOpacity(0.6),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(
-                              Icons.edit,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                        ),
-                      ],
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          children: [
+            _avatarPicker(),
+            const SizedBox(height: 24),
+            _buildCard(ProfileTextBox(controller: _nameController, label: "Name", validator: (val) => val!.isEmpty ? "Required" : null)),
+            _buildCard(ProfileTextBox(controller: _dobController, label: "Date of Birth", readOnly: true, onTap: _pickDOB, validator: (val) => val!.isEmpty ? "Required" : null)),
+            _buildCard(ProfileTextBox(controller: _ageController, label: "Age", readOnly: true)),
+            _buildCard(ProfileTextBox(controller: _emailController, label: "Email", validator: (val) => val!.contains('@') ? null : "Invalid email")),
+            _buildCard(ProfileTextBox(controller: _phoneController, label: "Phone", keyboardType: TextInputType.phone, validator: (val) => val!.length < 10 ? "Invalid number" : null)),
+            if (!isGuardian) _buildCard(ProfileTextBox(controller: _icController, label: "IC/Passport", readOnly: true)),
+            _buildCard(
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedInsurance,
+                      decoration: const InputDecoration(labelText: "Insurance Plan"),
+                      items: _insuranceOptions.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+                      onChanged: (val) {
+                        setState(() {
+                          _selectedInsurance = val;
+                          if (val != 'Others') _otherInsuranceController.clear();
+                        });
+                      },
+                      validator: (val) => val == null ? "Select insurance" : null,
                     ),
                   ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              _buildCard(
-                child: TextFormField(
-                  controller: _nameController,
-                  validator: (val) =>
-                  val == null || val.isEmpty
-                      ? "Name required"
-                      : null,
-                  style: TextStyle(
-                      fontSize: inputFontSize, fontWeight: FontWeight.w600),
-                  decoration: _inputDecoration("Name"),
-                ),
-              ),
-
-              _buildCard(
-                child: TextFormField(
-                  controller: _dobController,
-                  readOnly: true,
-                  onTap: _pickDOB,
-                  validator: (val) =>
-                  val == null || val.isEmpty
-                      ? 'Date of birth required'
-                      : null,
-                  style: TextStyle(fontSize: inputFontSize),
-                  decoration: _inputDecoration('Date of Birth').copyWith(
-                    suffixIcon: const Icon(
-                        Icons.calendar_today, color: Color(0xFF4CAF50)),
-                  ),
-                ),
-              ),
-              _buildCard(
-                child: TextFormField(
-                  controller: _ageController,
-                  readOnly: true,
-                  style: TextStyle(fontSize: inputFontSize),
-                  decoration: _inputDecoration('Age'),
-                ),
-              ),
-
-              _buildCard(
-                child: TextFormField(
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (val) =>
-                  val == null || !val.contains('@')
-                      ? "Enter a valid email"
-                      : null,
-                  style: TextStyle(fontSize: inputFontSize),
-                  decoration: _inputDecoration("Email"),
-                ),
-              ),
-
-              _buildCard(
-                child: TextFormField(
-                  controller: _phoneController,
-                  keyboardType: TextInputType.phone,
-                  validator: (val) =>
-                  val == null || val.length < 10
-                      ? "Invalid phone number"
-                      : null,
-                  style: TextStyle(fontSize: inputFontSize),
-                  decoration: _inputDecoration("Phone"),
-                ),
-              ),
-
-              if (!isGuardian)
-                _buildCard(
-                  child: TextFormField(
-                    controller: _icController,
-                    readOnly: true,
-                    style: TextStyle(fontSize: inputFontSize),
-                    decoration: _inputDecoration("IC/Passport Number"),
-                  ),
-                ),
-
-              _buildCard(
-                child: Row(
-                  children: [
+                  if (_selectedInsurance == 'Others') const SizedBox(width: 8),
+                  if (_selectedInsurance == 'Others')
                     Expanded(
-                      child: DropdownButtonFormField<String>(
-                        decoration: InputDecoration(
-                          labelText: 'Insurance Plan',
-                          labelStyle: TextStyle(fontSize: labelFontSize,
-                              color: const Color(0xFF4CAF50),
-                              fontWeight: FontWeight.w600),
-                          border: InputBorder.none,
-                        ),
-                        value: _selectedInsurance,
-                        items: _insuranceOptions
-                            .map((ins) =>
-                            DropdownMenuItem(
-                              value: ins,
-                              child: Text(ins,
-                                  style: TextStyle(fontSize: inputFontSize)),
-                            ))
-                            .toList(),
-                        onChanged: (val) {
-                          setState(() {
-                            _selectedInsurance = val;
-                            if (val != 'Others') {
-                              _otherInsuranceController.clear();
-                            }
-                          });
-                        },
-                        validator: (val) =>
-                        val == null || val.isEmpty
-                            ? 'Please select insurance'
-                            : null,
+                      child: ProfileTextBox(
+                        controller: _otherInsuranceController,
+                        label: "Specify Insurance",
+                        validator: (val) => val!.isEmpty ? "Required" : null,
                       ),
                     ),
-                    if (_selectedInsurance == 'Others')
-                      const SizedBox(width: 12),
-                    if (_selectedInsurance == 'Others')
-                      Expanded(
-                        child: TextFormField(
-                          controller: _otherInsuranceController,
-                          validator: (val) {
-                            if (_selectedInsurance == 'Others' &&
-                                (val == null || val.isEmpty)) {
-                              return 'Please specify insurance';
-                            }
-                            return null;
-                          },
-                          style: TextStyle(fontSize: inputFontSize),
-                          decoration: _inputDecoration('Specify Insurance'),
-                        ),
-                      ),
-                  ],
-                ),
+                ],
               ),
+            ),
+            _buildCard(ProfileTextBox(controller: _heightController, label: "Height (cm)", keyboardType: TextInputType.number, validator: (val) => double.tryParse(val!) != null ? null : "Invalid")),
 
-              _buildCard(
-                child: TextFormField(
-                  controller: _heightController,
-                  keyboardType: TextInputType.number,
-                  validator: (val) {
-                    if (val == null || val.isEmpty) return 'Height required';
-                    final h = double.tryParse(val);
-                    if (h == null || h <= 0) return 'Enter valid height';
-                    return null;
-                  },
-                  style: TextStyle(fontSize: inputFontSize),
-                  decoration: _inputDecoration("Height (cm)"),
-                ),
+            _buildCard(ProfileTextBox(controller: _weightController, label: "Weight (kg)", keyboardType: TextInputType.number, validator: (val) => double.tryParse(val!) != null ? null : "Invalid")),
+
+            _buildCard(ProfileTextBox(controller: _familyDoctorController, label: "Family Doctor")),
+            _buildCard(ProfileTextBox(controller: _emergencyContactController, label: "Emergency Contact")),
+            if (!isGuardian) _buildCard(ProfileTextBox(controller: _medicalController, label: "Medical History", maxLines: 3)),
+            _buildCard(ProfileTextBox(controller: _allergyController, label: "Allergy History", maxLines: 3)),
+
+            const SizedBox(height: 30),
+            SizedBox(
+              height: 50,
+              child: ElevatedButton.icon(
+                onPressed: _save,
+                icon: const Icon(Icons.save),
+                label: const Text("Save Changes", style: TextStyle(fontSize: 18)),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF4CAF50), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
               ),
-
-              _buildCard(
-                child: TextFormField(
-                  controller: _weightController,
-                  keyboardType: TextInputType.number,
-                  validator: (val) {
-                    if (val == null || val.isEmpty) return 'Weight required';
-                    final w = double.tryParse(val);
-                    if (w == null || w <= 0) return 'Enter valid weight';
-                    return null;
-                  },
-                  style: TextStyle(fontSize: inputFontSize),
-                  decoration: _inputDecoration("Weight (kg)"),
-                ),
-              ),
-
-              _buildCard(
-                child: TextFormField(
-                  controller: _familyDoctorController,
-                  style: TextStyle(fontSize: inputFontSize),
-                  decoration: _inputDecoration("Family Doctor"),
-                ),
-              ),
-
-              _buildCard(
-                child: TextFormField(
-                  controller: _emergencyContactController,
-                  style: TextStyle(fontSize: inputFontSize),
-                  decoration: _inputDecoration("Emergency Contact"),
-                ),
-              ),
-
-              if (!isGuardian)
-                _buildCard(
-                  child: TextFormField(
-                    controller: _medicalController,
-                    maxLines: 3,
-                    style: TextStyle(fontSize: inputFontSize),
-                    decoration: _inputDecoration("Medical History"),
-                  ),
-                ),
-
-              _buildCard(
-                child: TextFormField(
-                  controller: _allergyController,
-                  maxLines: 3,
-                  style: TextStyle(fontSize: inputFontSize),
-                  decoration: _inputDecoration("Allergy History"),
-                ),
-              ),
-
-              const SizedBox(height: 40),
-
-              SizedBox(
-                height: 56,
-                child: ElevatedButton.icon(
-                  icon: const Icon(Icons.save, size: 28),
-                  label: Text(
-                    "Save Changes",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4CAF50),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    shadowColor: Colors.teal.shade700,
-                    elevation: 6,
-                    animationDuration: const Duration(milliseconds: 250),
-                  ),
-                  onPressed: _save,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool isGuardian;
-
   const ProfileScreen({Key? key, this.isGuardian = false}) : super(key: key);
 
   @override
@@ -42,21 +41,20 @@ class _ProfileScreenState extends State<ProfileScreen>
   void _unlink(BuildContext context, String name) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (_) => AlertDialog(
-            title: const Text("Confirm Unlink"),
-            content: Text("Are you sure you want to unlink from $name?"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text("Cancel"),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text("Unlink"),
-              ),
-            ],
+      builder: (_) => AlertDialog(
+        title: const Text("Confirm Unlink"),
+        content: Text("Are you sure you want to unlink from $name?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("Cancel"),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Unlink"),
+          ),
+        ],
+      ),
     );
 
     if (confirmed == true) {
@@ -158,8 +156,6 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-
-    // 响应式字体大小
     final bool isSmallScreen = screenWidth < 360;
     final double titleFontSize = isSmallScreen ? 18 : 22;
     final double subtitleFontSize = isSmallScreen ? 14 : 18;
@@ -195,18 +191,10 @@ class _ProfileScreenState extends State<ProfileScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.teal.shade200, width: 3),
-                ),
-                child: CircleAvatar(
-                  radius: 54,
-                  backgroundImage: const AssetImage(
-                    'assets/images/senior_profile.png',
-                  ),
-                  backgroundColor: Colors.transparent,
-                ),
+              CircleAvatar(
+                radius: 54,
+                backgroundImage:
+                    const AssetImage('assets/images/senior_profile.png'),
               ),
               const SizedBox(height: 20),
               Text(
@@ -221,33 +209,23 @@ class _ProfileScreenState extends State<ProfileScreen>
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Age: 65",
-                    style: TextStyle(
-                      color: Colors.teal.shade800,
-                      fontSize: subtitleFontSize,
-                    ),
-                  ),
+                  Text("Age: 65",
+                      style: TextStyle(
+                          color: Colors.teal.shade800,
+                          fontSize: subtitleFontSize)),
                   const SizedBox(width: 20),
-                  Text(
-                    "Height: 170 cm",
-                    style: TextStyle(
-                      color: Colors.teal.shade800,
-                      fontSize: subtitleFontSize,
-                    ),
-                  ),
+                  Text("Height: 170 cm",
+                      style: TextStyle(
+                          color: Colors.teal.shade800,
+                          fontSize: subtitleFontSize)),
                   const SizedBox(width: 20),
-                  Text(
-                    "Weight: 65 kg",
-                    style: TextStyle(
-                      color: Colors.green.shade800,
-                      fontSize: subtitleFontSize,
-                    ),
-                  ),
+                  Text("Weight: 65 kg",
+                      style: TextStyle(
+                          color: Colors.green.shade800,
+                          fontSize: subtitleFontSize)),
                 ],
               ),
               const SizedBox(height: 28),
-
               _sectionCard(
                 width: screenWidth * 0.9,
                 child: Column(
@@ -259,7 +237,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ],
                 ),
               ),
-
               _sectionCard(
                 width: screenWidth * 0.9,
                 child: _infoBlock(
@@ -269,7 +246,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                   infoFontSize,
                 ),
               ),
-
               _sectionCard(
                 width: screenWidth * 0.9,
                 child: _infoBlock(
@@ -279,7 +255,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                   infoFontSize,
                 ),
               ),
-
               _sectionCard(
                 width: screenWidth * 0.9,
                 child: _infoBlock(
@@ -292,7 +267,6 @@ class _ProfileScreenState extends State<ProfileScreen>
                   infoFontSize,
                 ),
               ),
-
               _sectionCard(
                 width: screenWidth * 0.9,
                 child: _infoBlock(
@@ -302,62 +276,26 @@ class _ProfileScreenState extends State<ProfileScreen>
                   infoFontSize,
                 ),
               ),
-
               const SizedBox(height: 18),
-
-              if (widget.isGuardian) ...[
-                Divider(color: Colors.teal.shade300, thickness: 1.5),
-                const SizedBox(height: 12),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Linked Seniors",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: titleFontSize + 2,
-                      color: Colors.teal.shade900,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.teal.shade200.withOpacity(0.3),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
+              if (widget.isGuardian)
+                _sectionCard(
+                  width: screenWidth * 0.9,
                   child: ListTile(
-                    title: Text(
-                      "Grandma Mary",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: infoFontSize,
-                      ),
-                    ),
-                    subtitle: Text(
-                      "mary.senior@careplus.com",
-                      style: TextStyle(fontSize: infoFontSize - 2),
-                    ),
+                    title: Text("Grandma Mary",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: infoFontSize)),
+                    subtitle: Text("mary.senior@careplus.com",
+                        style: TextStyle(fontSize: infoFontSize - 2)),
                     trailing: IconButton(
-                      icon: Icon(
-                        Icons.link_off,
-                        color: Colors.red.shade400,
-                        size: infoFontSize + 4,
-                      ),
+                      icon: Icon(Icons.link_off,
+                          color: Colors.red.shade400,
+                          size: infoFontSize + 4),
                       onPressed: () => _unlink(context, "Grandma Mary"),
-                      tooltip: 'Unlink Grandma Mary',
                     ),
                   ),
-                ),
-              ] else ...[
-                Divider(color: Colors.teal.shade300, thickness: 1.5),
-                const SizedBox(height: 20),
+                )
+              else
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -369,7 +307,59 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                   ),
                 ),
-              ],
+
+              const SizedBox(height: 24),
+
+              // ✅ Logout Button with Confirmation
+              ElevatedButton.icon(
+                onPressed: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Confirm Logout'),
+                      content:
+                          const Text('Are you sure you want to log out?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('Logout'),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (confirm == true) {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/login',
+                      (route) => false,
+                    );
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("You have been logged out."),
+                        backgroundColor: Colors.teal,
+                      ),
+                    );
+                  }
+                },
+                icon: const Icon(Icons.logout, color: Colors.white),
+                label: const Text(
+                  "Logout",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal.shade700,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
             ],
           ),
         ),

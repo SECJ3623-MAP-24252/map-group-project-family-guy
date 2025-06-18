@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
-import 'package:Care_Plus/screens/Home/ManageMedicineSchedule.dart';
+import 'package:Care_Plus/screens/home/manage_medicine_screen.dart';
 import 'package:Care_Plus/screens/contact_relatives/contact_relatives_screen.dart';
+import 'package:Care_Plus/screens/home/nearby_hospitals_screen.dart';
 
-class oldHomeScreen extends StatelessWidget {
+class OldHomepageScreen extends StatelessWidget {
   final List<Map<String, dynamic>> features = [
     {'title': 'Appointment Reminder', 'icon': Icons.calendar_today},
     {'title': 'Add Medicine Reminder', 'icon': Icons.medication_outlined},
@@ -16,35 +17,39 @@ class oldHomeScreen extends StatelessWidget {
   ];
 
   void _navigateToFeature(BuildContext context, String title) {
-    if (title == 'Add Medicine Reminder') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ManageMedicineSchedule()),
-      );
-    } else if (title == 'Contact Relatives') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ContactRelativesScreen()),
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ComingSoonPage(title: title)),
-      );
+    switch (title) {
+      case 'Add Medicine Reminder':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ManageMedicineScreen(),
+          ),
+        );
+        break;
+      case 'Contact Relatives':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ContactRelativesScreen(),
+          ),
+        );
+        break;
+      case 'Locate Nearby Hospital':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => NearbyHospitalsScreen(),
+          ),
+        );
+        break;
+      default:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ComingSoonPage(title: title),
+          ),
+        );
     }
-  }
-
-  void _navigateToSettings(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const ComingSoonPage(title: 'Settings'),
-      ),
-    );
-  }
-
-  void _logout(BuildContext context) {
-    Navigator.pushReplacementNamed(context, '/login');
   }
 
   @override
@@ -55,6 +60,11 @@ class oldHomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Care Plus'),
         backgroundColor: themeColor,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          tooltip: 'Back',
+          onPressed: () => Navigator.pop(context),
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.person),
@@ -63,36 +73,12 @@ class oldHomeScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => profile_page.ProfileScreen(),
+                  builder: (_) => profile_page.ProfileScreen(),
                 ),
               );
             },
           ),
         ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.teal),
-              child: Text(
-                'Menu',
-                style: TextStyle(fontSize: 24, color: Colors.white),
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings', style: TextStyle(fontSize: 18)),
-              onTap: () => _navigateToSettings(context),
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout', style: TextStyle(fontSize: 18)),
-              onTap: () => _logout(context),
-            ),
-          ],
-        ),
       ),
       backgroundColor: Colors.grey.shade100,
       body: Padding(
@@ -118,7 +104,8 @@ class oldHomeScreen extends StatelessWidget {
                     elevation: 4,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
-                      onTap: () => _navigateToFeature(context, item['title']),
+                      onTap: () =>
+                          _navigateToFeature(context, item['title']),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Column(
