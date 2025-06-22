@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -36,7 +35,7 @@ class HospitalMapLogic {
       perm = await Geolocator.requestPermission();
       if (perm != LocationPermission.always &&
           perm != LocationPermission.whileInUse) {
-        return null; 
+        return null;
       }
     }
     final pos = await Geolocator.getCurrentPosition();
@@ -48,19 +47,20 @@ class HospitalMapLogic {
     if (_apiKey == null) return [];
     final loc = '${center.latitude},${center.longitude}';
     final nearbyUrl = Uri.parse(
-        'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
-        '?location=$loc&radius=2000&type=hospital&key=$_apiKey');
+      'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
+      '?location=$loc&radius=2000&type=hospital&key=$_apiKey',
+    );
 
     final nearbyRes = await http.get(nearbyUrl);
     final results = (jsonDecode(nearbyRes.body)['results'] as List?) ?? [];
 
-   
     final futures = results.map((p) async {
       final placeId = p['place_id'];
       final detailUrl = Uri.parse(
-          'https://maps.googleapis.com/maps/api/place/details/json'
-          '?place_id=$placeId'
-          '&fields=formatted_phone_number,opening_hours&key=$_apiKey');
+        'https://maps.googleapis.com/maps/api/place/details/json'
+        '?place_id=$placeId'
+        '&fields=formatted_phone_number,opening_hours&key=$_apiKey',
+      );
 
       String phone = 'None';
       String opening = 'None';
@@ -72,9 +72,7 @@ class HospitalMapLogic {
         if (weekday is List && weekday.isNotEmpty) {
           opening = weekday.join('\n');
         }
-      } catch (_) {
-        
-      }
+      } catch (_) {}
 
       return Hospital(
         name: p['name'] ?? 'Unknown',
@@ -92,12 +90,13 @@ class HospitalMapLogic {
     return Future.wait(futures);
   }
 
-  //  Marker 工厂 
+  //  Marker 工厂
   List<Marker> createMarkers(List<Hospital> list, BuildContext ctx) {
     return list.map((h) {
       return Marker(
-        markerId:
-            MarkerId('${h.name}-${h.location.latitude}-${h.location.longitude}'),
+        markerId: MarkerId(
+          '${h.name}-${h.location.latitude}-${h.location.longitude}',
+        ),
         position: h.location,
         infoWindow: InfoWindow(
           title: h.name,
@@ -110,32 +109,30 @@ class HospitalMapLogic {
 
   // infodialog
   void _showDetailDialog(BuildContext pageCtx, Hospital h) {
-  showDialog(
-    context: pageCtx,
-    builder: (dialogCtx) {          
-      return AlertDialog(
-        title: Text(h.name),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('📍 Address: ${h.address}'),
-            Text('📞 Tel: ${h.phone}'),
-            Text('⭐ Rating: ${h.rating}'),
-            const SizedBox(height: 8),
-            Text('🕒 Opening Hours:${h.openingHours}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-          
-            onPressed: () => Navigator.pop(dialogCtx),
-            child: const Text('Close'),
+    showDialog(
+      context: pageCtx,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          title: Text(h.name),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('📍 Address: ${h.address}'),
+              Text('📞 Tel: ${h.phone}'),
+              Text('⭐ Rating: ${h.rating}'),
+              const SizedBox(height: 8),
+              Text('🕒 Opening Hours:${h.openingHours}'),
+            ],
           ),
-        ],
-      );
-    },
-  );
-}
-
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

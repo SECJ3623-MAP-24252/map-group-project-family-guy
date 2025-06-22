@@ -3,7 +3,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 
 /// Agora 配置
-const String agoraAppId = '14e959682c9747919c09ec3ebe4accda';
+const String agoraAppId = '14e959682c9747919c09ec3ebe4accda';//service 
 const String agoraToken = '';         // 测试版无需 Token
 const String agoraChannel = 'test_channel';
 
