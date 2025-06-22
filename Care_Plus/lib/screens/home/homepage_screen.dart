@@ -1,33 +1,22 @@
-import 'package:Care_Plus/screens/document/document.dart';
 import 'package:flutter/material.dart';
-import 'package:Care_Plus/screens/home/oldhomepage.dart';
+import 'package:Care_Plus/screens/document/document_screen.dart';
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
-import 'package:Care_Plus/screens/appointment/appointment_page.dart'; // 路径请根据你实际项目调整
+import 'package:Care_Plus/screens/appointment/appointment_screen.dart';
 import 'package:Care_Plus/screens/relative/chat.dart';
+<<<<<<< HEAD:Care_Plus/lib/screens/home/homepage.dart
 import 'package:Care_Plus/screens/hospital/hospital_map_screen.dart';
 
+=======
+import 'package:Care_Plus/screens/home/old_homepage_screen.dart';
+import 'package:Care_Plus/widgets/action_button.dart';
+>>>>>>> e89070fd537ab54d258aeba449c5521cb469e32b:Care_Plus/lib/screens/home/homepage_screen.dart
 
-void main() {
-  runApp(HomeScreen());
-}
-
-class HomeScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(fontFamily: 'Roboto'),
-      home: WalletHomePage(),
-    );
-  }
-}
-
-class WalletHomePage extends StatelessWidget {
+class HomepageScreen extends StatelessWidget {
   final List<Map<String, String>> quickSendList = [
     {'name': 'son', 'image': 'assets/images/man.png'},
   ];
 
-  final List<Map<String, dynamic>> AppointmentList = [
+  final List<Map<String, dynamic>> appointmentList = [
     {
       'icon': Icons.medication_outlined,
       'label': 'Medicine Reminder',
@@ -60,7 +49,7 @@ class WalletHomePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ✅ Header with clickable avatar
+              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -76,9 +65,8 @@ class WalletHomePage extends StatelessWidget {
                           );
                         },
                         child: const CircleAvatar(
-                          backgroundImage: AssetImage(
-                            'assets/images/senior_profile.png',
-                          ),
+                          backgroundImage:
+                              AssetImage('assets/images/senior_profile.png'),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -102,7 +90,7 @@ class WalletHomePage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // ✅ Profile card
+              // Profile Card
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
@@ -116,9 +104,8 @@ class WalletHomePage extends StatelessWidget {
                       children: const [
                         CircleAvatar(
                           radius: 30,
-                          backgroundImage: AssetImage(
-                            'assets/images/senior_profile.png',
-                          ),
+                          backgroundImage:
+                              AssetImage('assets/images/senior_profile.png'),
                         ),
                         SizedBox(width: 15),
                         Text(
@@ -132,45 +119,38 @@ class WalletHomePage extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      'Age: 67',
-                      style: TextStyle(color: Colors.white70, fontSize: 16),
-                    ),
+                    const Text('Age: 67',
+                        style: TextStyle(color: Colors.white70, fontSize: 16)),
                     const SizedBox(height: 5),
-                    const Text(
-                      'Phone: +60 12-345 6789',
-                      style: TextStyle(color: Colors.white70, fontSize: 16),
-                    ),
+                    const Text('Phone: +60 12-345 6789',
+                        style: TextStyle(color: Colors.white70, fontSize: 16)),
                     const SizedBox(height: 5),
-                    const Text(
-                      'Email: john.doe@email.com',
-                      style: TextStyle(color: Colors.white70, fontSize: 16),
-                    ),
+                    const Text('Email: john.doe@email.com',
+                        style: TextStyle(color: Colors.white70, fontSize: 16)),
                   ],
                 ),
               ),
               const SizedBox(height: 20),
 
-              // Action buttons
+              // Action Buttons
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  actionButton(
-                    Icons.send,
-                    'Appointment',
+                  ActionButton(
+                    icon: Icons.send,
+                    label: 'Appointment',
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => AppointmentPage(),
-                        ), // ✅ 替换为你的预约界面
+                          builder: (_) => AppointmentScreen(),
+                        ),
                       );
                     },
                   ),
-
-                  actionButton(
-                    Icons.receipt_long,
-                    'Documents',
+                  ActionButton(
+                    icon: Icons.receipt_long,
+                    label: 'Documents',
                     onTap: () {
                       Navigator.push(
                         context,
@@ -180,22 +160,22 @@ class WalletHomePage extends StatelessWidget {
                       );
                     },
                   ),
-                  actionButton(
-                    Icons.phone_android,
-                    'Relative',
+                  ActionButton(
+                    icon: Icons.phone_android,
+                    label: 'Relative',
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder:
-                              (_) => ChatPage(
-                                name: 'son',
-                                imagePath: 'assets/images/man.png',
-                              ),
+                          builder: (_) => ChatPage(
+                            name: 'son',
+                            imagePath: 'assets/images/man.png',
+                          ),
                         ),
                       );
                     },
                   ),
+<<<<<<< HEAD:Care_Plus/lib/screens/home/homepage.dart
 
                   actionButton(
           Icons.map,
@@ -210,11 +190,18 @@ class WalletHomePage extends StatelessWidget {
                   actionButton(
                     Icons.more_horiz,
                     'More',
+=======
+                  ActionButton(
+                    icon: Icons.more_horiz,
+                    label: 'More',
+>>>>>>> e89070fd537ab54d258aeba449c5521cb469e32b:Care_Plus/lib/screens/home/homepage_screen.dart
                     highlight: true,
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => oldHomeScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => OldHomepageScreen(),
+                        ),
                       );
                     },
                   ),
@@ -223,105 +210,57 @@ class WalletHomePage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Quick Send
-              const Text(
-                "Quick Send",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              const Text("Quick Send",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
-              Container(
+              SizedBox(
                 height: 80,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  children:
-                      quickSendList.map((item) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 10.0),
-                          child: Column(
-                            children: [
-                              CircleAvatar(
-                                backgroundImage: AssetImage(item['image']!),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(item['name']!),
-                            ],
+                  children: quickSendList.map((item) {
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 10.0),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: AssetImage(item['image']!),
                           ),
-                        );
-                      }).toList(),
+                          const SizedBox(height: 5),
+                          Text(item['name']!),
+                        ],
+                      ),
+                    );
+                  }).toList(),
                 ),
               ),
               const SizedBox(height: 20),
 
-              // Recent Appointment
-              const Text(
-                "Recent Appointment",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+              // Recent Appointments
+              const Text("Recent Appointment",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               Column(
-                children:
-                    AppointmentList.map((activity) {
-                      return ListTile(
-                        leading: Icon(activity['icon'], color: Colors.black54),
-                        title: Text(activity['label']),
-                        trailing: Text(
-                          activity['amount'],
-                          style: TextStyle(
-                            color:
-                                activity['amount'].toString().startsWith('-')
-                                    ? Colors.red
-                                    : Colors.green,
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                children: appointmentList.map((activity) {
+                  return ListTile(
+                    leading: Icon(activity['icon'], color: Colors.black54),
+                    title: Text(activity['label']),
+                    trailing: Text(
+                      activity['amount'],
+                      style: TextStyle(
+                        color: activity['amount']
+                                .toString()
+                                .startsWith('Pending')
+                            ? Colors.red
+                            : Colors.green,
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget actionButton(
-    IconData icon,
-    String label, {
-    bool highlight = false,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          CircleAvatar(
-            backgroundColor:
-                highlight ? const Color(0xFFC6F5C6) : const Color(0xFFE7F9E7),
-            child: Icon(icon, color: Colors.black),
-          ),
-          const SizedBox(height: 5),
-          Text(label),
-        ],
-      ),
-    );
-  }
-}
-
-// ⬇️ Dummy Pages for Navigation
-class SendPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Appointment Page')),
-      body: const Center(child: Text('This is the Appointment Page')),
-    );
-  }
-}
-
-class BillPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Documents Page')),
-      body: const Center(child: Text('This is the Documents Page')),
     );
   }
 }
