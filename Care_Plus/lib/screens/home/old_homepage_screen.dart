@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
 import 'package:Care_Plus/screens/home/manage_medicine_screen.dart';
-import 'package:Care_Plus/screens/contact_relatives/contact_relatives_screen.dart';
 import 'package:Care_Plus/screens/home/nearby_hospitals_screen.dart';
+import 'package:Care_Plus/screens/relative/chat.dart';
 
 class OldHomepageScreen extends StatelessWidget {
   final List<Map<String, dynamic>> features = [
@@ -30,7 +30,10 @@ class OldHomepageScreen extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => const ContactRelativesScreen(),
+            builder: (_) => const ChatPage(
+              name: 'son',
+              imagePath: 'assets/images/man.png',
+            ),
           ),
         );
         break;
@@ -73,7 +76,7 @@ class OldHomepageScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => profile_page.ProfileScreen(),
+                  builder: (_) => const profile_page.ProfileScreen(),
                 ),
               );
             },
@@ -104,8 +107,7 @@ class OldHomepageScreen extends StatelessWidget {
                     elevation: 4,
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
-                      onTap: () =>
-                          _navigateToFeature(context, item['title']),
+                      onTap: () => _navigateToFeature(context, item['title']),
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Column(
@@ -139,7 +141,7 @@ class OldHomepageScreen extends StatelessWidget {
 class ComingSoonPage extends StatelessWidget {
   final String title;
 
-  const ComingSoonPage({super.key, required this.title});
+  const ComingSoonPage({Key? key, required this.title}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

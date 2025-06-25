@@ -1,21 +1,27 @@
-import 'package:flutter/material.dart';
-
 class Appointment {
-  final String patientName;
-  final String hospitalName;
-  final String doctorName;
-  final DateTime dateTime;
-  final IconData icon;
-  final String location;
-  final String note;
+  String? id;
+  String patientName;
+  DateTime dateTime;
+  String note;
 
   Appointment({
+    this.id,
     required this.patientName,
-    required this.hospitalName,
-    required this.doctorName,
     required this.dateTime,
-    required this.icon,
-    required this.location,
     required this.note,
   });
+
+  Map<String, dynamic> toMap() => {
+        'patientName': patientName,
+        'dateTime': dateTime.toIso8601String(),
+        'note': note,
+      };
+
+  factory Appointment.fromMap(String id, Map<String, dynamic> m) =>
+      Appointment(
+        id: id,
+        patientName: m['patientName'],
+        dateTime: DateTime.parse(m['dateTime']),
+        note: m['note'],
+      );
 }

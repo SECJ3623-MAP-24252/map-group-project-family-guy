@@ -5,7 +5,7 @@ import 'dart:async';
 import 'package:Care_Plus/screens/login/login_screen.dart'; 
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({Key? key, required Null Function() onFinished}) : super(key: key);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
