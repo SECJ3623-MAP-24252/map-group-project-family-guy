@@ -2,17 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
 import 'package:Care_Plus/screens/home/manage_medicine_screen.dart';
 import 'package:Care_Plus/screens/contact_relatives/contact_relatives_screen.dart';
-<<<<<<< HEAD:Care_Plus/lib/screens/home/oldhomepage.dart
-import 'package:Care_Plus/screens/hospital/hospital_map_screen.dart';
-
-
-
-              
-
-
-=======
 import 'package:Care_Plus/screens/home/nearby_hospitals_screen.dart';
->>>>>>> e89070fd537ab54d258aeba449c5521cb469e32b:Care_Plus/lib/screens/home/old_homepage_screen.dart
 
 class OldHomepageScreen extends StatelessWidget {
   final List<Map<String, dynamic>> features = [
@@ -27,29 +17,6 @@ class OldHomepageScreen extends StatelessWidget {
   ];
 
   void _navigateToFeature(BuildContext context, String title) {
-<<<<<<< HEAD:Care_Plus/lib/screens/home/oldhomepage.dart
-    if (title == 'Add Medicine Reminder') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ManageMedicineSchedule()),
-      );
-    } else if (title == 'Locate Nearby Hospital') {              // ★ 新增
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const HospitalMapScreen()),
-    );
-    }
-  else if (title == 'Contact Relatives') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const ContactRelativesScreen()),
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ComingSoonPage(title: title)),
-      );
-=======
     switch (title) {
       case 'Add Medicine Reminder':
         Navigator.push(
@@ -82,7 +49,6 @@ class OldHomepageScreen extends StatelessWidget {
             builder: (_) => ComingSoonPage(title: title),
           ),
         );
->>>>>>> e89070fd537ab54d258aeba449c5521cb469e32b:Care_Plus/lib/screens/home/old_homepage_screen.dart
     }
   }
 

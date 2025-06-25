@@ -4,13 +4,8 @@ import 'package:Care_Plus/calls/vidio_call_page.dart';
 import 'package:Care_Plus/calls/voice_call_page.dart';
 
 /// Agora 配置
-<<<<<<< HEAD
-const String agoraAppId = '14e959682c9747919c09ec3ebe4accda';//service 
-const String agoraToken = '';         // 测试版无需 Token
-=======
 const String agoraAppId = '14e959682c9747919c09ec3ebe4accda';
 const String agoraToken = '';         
->>>>>>> e89070fd537ab54d258aeba449c5521cb469e32b
 const String agoraChannel = 'test_channel';
 
 /// 聊天气泡组件

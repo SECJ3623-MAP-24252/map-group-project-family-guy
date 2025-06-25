@@ -12,6 +12,7 @@ class HospitalMapScreen extends StatefulWidget {
 
 class _HospitalMapScreenState extends State<HospitalMapScreen> {
   final HospitalMapLogic _logic = HospitalMapLogic();
+  // ignore: unused_field
   GoogleMapController? _mapController;
 
   LatLng? _current;

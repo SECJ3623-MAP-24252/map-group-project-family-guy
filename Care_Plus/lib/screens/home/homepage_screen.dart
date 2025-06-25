@@ -3,13 +3,8 @@ import 'package:Care_Plus/screens/document/document_screen.dart';
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
 import 'package:Care_Plus/screens/appointment/appointment_screen.dart';
 import 'package:Care_Plus/screens/relative/chat.dart';
-<<<<<<< HEAD:Care_Plus/lib/screens/home/homepage.dart
-import 'package:Care_Plus/screens/hospital/hospital_map_screen.dart';
-
-=======
 import 'package:Care_Plus/screens/home/old_homepage_screen.dart';
 import 'package:Care_Plus/widgets/action_button.dart';
->>>>>>> e89070fd537ab54d258aeba449c5521cb469e32b:Care_Plus/lib/screens/home/homepage_screen.dart
 
 class HomepageScreen extends StatelessWidget {
   final List<Map<String, String>> quickSendList = [
@@ -175,26 +170,9 @@ class HomepageScreen extends StatelessWidget {
                       );
                     },
                   ),
-<<<<<<< HEAD:Care_Plus/lib/screens/home/homepage.dart
-
-                  actionButton(
-          Icons.map,
-      'Hospital',
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => HospitalMapScreen()),
-        );
-      },
-    ),
-                  actionButton(
-                    Icons.more_horiz,
-                    'More',
-=======
                   ActionButton(
                     icon: Icons.more_horiz,
                     label: 'More',
->>>>>>> e89070fd537ab54d258aeba449c5521cb469e32b:Care_Plus/lib/screens/home/homepage_screen.dart
                     highlight: true,
                     onTap: () {
                       Navigator.push(
