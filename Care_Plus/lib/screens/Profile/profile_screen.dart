@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool isGuardian;
@@ -13,6 +15,13 @@ class _ProfileScreenState extends State<ProfileScreen>
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
 
+  final _docRef = FirebaseFirestore.instance
+      .collection('profiles_demo')
+      .doc('currentProfile');
+
+  Map<String, dynamic>? _data;
+  ImageProvider? _avatarImage;
+
   @override
   void initState() {
     super.initState();
@@ -22,6 +31,23 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
     _fadeAnimation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final snap = await _docRef.get();
+    if (snap.exists) {
+      final d = snap.data()!;
+      ImageProvider? avatar;
+      final b64 = d['avatarBase64'] as String?;
+      if (b64 != null && b64.isNotEmpty) {
+        avatar = MemoryImage(base64Decode(b64));
+      }
+      setState(() {
+        _data = d;
+        _avatarImage = avatar;
+      });
+    }
   }
 
   @override
@@ -35,52 +61,21 @@ class _ProfileScreenState extends State<ProfileScreen>
       context,
       '/profile/edit',
       arguments: {'isGuardian': widget.isGuardian},
-    );
-  }
-
-  void _unlink(BuildContext context, String name) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Confirm Unlink"),
-        content: Text("Are you sure you want to unlink from $name?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text("Unlink"),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "You have unlinked from $name. A notification was sent.",
-          ),
-          backgroundColor: Colors.teal,
-        ),
-      );
-    }
+    ).then((_) => _loadProfile());
   }
 
   Widget _sectionCard({required Widget child, double? width}) {
     return Container(
       width: width,
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      padding: const EdgeInsets.all(18),
+      margin: const EdgeInsets.symmetric(vertical: 10.0),
+      padding: const EdgeInsets.all(18.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(14.0),
         boxShadow: [
           BoxShadow(
             color: Colors.teal.shade200.withOpacity(0.3),
-            blurRadius: 10,
+            blurRadius: 10.0,
             offset: const Offset(0, 6),
           ),
         ],
@@ -91,18 +86,18 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _infoRow(String label, String value, double fontSize) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
         children: [
           Text(
-            "$label:",
+            '$label:',
             style: TextStyle(
               color: Colors.teal.shade700,
               fontWeight: FontWeight.w700,
               fontSize: fontSize,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 12.0),
           Expanded(
             child: Text(
               value,
@@ -135,12 +130,12 @@ class _ProfileScreenState extends State<ProfileScreen>
             color: Colors.teal.shade900,
           ),
         ),
-        const SizedBox(height: 10),
+        const SizedBox(height: 10.0),
         ...items.map(
           (item) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
             child: Text(
-              "• $item",
+              '• $item',
               style: TextStyle(
                 fontSize: itemSize,
                 color: Colors.black87,
@@ -156,10 +151,10 @@ class _ProfileScreenState extends State<ProfileScreen>
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final bool isSmallScreen = screenWidth < 360;
-    final double titleFontSize = isSmallScreen ? 18 : 22;
-    final double subtitleFontSize = isSmallScreen ? 14 : 18;
-    final double infoFontSize = isSmallScreen ? 16 : 20;
+    final bool isSmallScreen = screenWidth < 360.0;
+    final double titleFontSize = isSmallScreen ? 18.0 : 22.0;
+    final double subtitleFontSize = isSmallScreen ? 14.0 : 18.0;
+    final double infoFontSize = isSmallScreen ? 16.0 : 20.0;
 
     return Scaffold(
       backgroundColor: Colors.teal.shade50,
@@ -167,11 +162,11 @@ class _ProfileScreenState extends State<ProfileScreen>
         backgroundColor: Colors.teal.shade600,
         elevation: 0,
         title: Text(
-          "Profile",
+          'Profile',
           style: TextStyle(
             color: Colors.teal.shade50,
             fontWeight: FontWeight.bold,
-            fontSize: titleFontSize + 4,
+            fontSize: titleFontSize + 4.0,
           ),
         ),
         centerTitle: true,
@@ -184,186 +179,133 @@ class _ProfileScreenState extends State<ProfileScreen>
           ),
         ],
       ),
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CircleAvatar(
-                radius: 54,
-                backgroundImage:
-                    const AssetImage('assets/images/senior_profile.png'),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                "John Doe",
-                style: TextStyle(
-                  fontSize: titleFontSize + 8,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.teal.shade900,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Age: 65",
-                      style: TextStyle(
-                          color: Colors.teal.shade800,
-                          fontSize: subtitleFontSize)),
-                  const SizedBox(width: 20),
-                  Text("Height: 170 cm",
-                      style: TextStyle(
-                          color: Colors.teal.shade800,
-                          fontSize: subtitleFontSize)),
-                  const SizedBox(width: 20),
-                  Text("Weight: 65 kg",
-                      style: TextStyle(
-                          color: Colors.green.shade800,
-                          fontSize: subtitleFontSize)),
-                ],
-              ),
-              const SizedBox(height: 28),
-              _sectionCard(
-                width: screenWidth * 0.9,
+      body: _data == null
+          ? const Center(child: CircularProgressIndicator())
+          : FadeTransition(
+              opacity: _fadeAnimation,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    _infoRow("Email", "john.doe@example.com", infoFontSize),
-                    _infoRow("Phone", "+60123456789", infoFontSize),
-                    _infoRow("IC/Passport", "A1234567", infoFontSize),
-                  ],
-                ),
-              ),
-              _sectionCard(
-                width: screenWidth * 0.9,
-                child: _infoBlock(
-                  "Allergies",
-                  ["Penicillin", "Peanuts"],
-                  titleFontSize,
-                  infoFontSize,
-                ),
-              ),
-              _sectionCard(
-                width: screenWidth * 0.9,
-                child: _infoBlock(
-                  "Medical History",
-                  ["Diabetes", "Hypertension"],
-                  titleFontSize,
-                  infoFontSize,
-                ),
-              ),
-              _sectionCard(
-                width: screenWidth * 0.9,
-                child: _infoBlock(
-                  "Insurance & Family Doctor",
-                  [
-                    "Insurance: HealthPlus Basic",
-                    "Family Doctor: Dr. Lee Cheng",
-                  ],
-                  titleFontSize,
-                  infoFontSize,
-                ),
-              ),
-              _sectionCard(
-                width: screenWidth * 0.9,
-                child: _infoBlock(
-                  "Emergency Contact",
-                  ["Jane Smith (+60198765432)"],
-                  titleFontSize,
-                  infoFontSize,
-                ),
-              ),
-              const SizedBox(height: 18),
-              if (widget.isGuardian)
-                _sectionCard(
-                  width: screenWidth * 0.9,
-                  child: ListTile(
-                    title: Text("Grandma Mary",
-                        style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: infoFontSize)),
-                    subtitle: Text("mary.senior@careplus.com",
-                        style: TextStyle(fontSize: infoFontSize - 2)),
-                    trailing: IconButton(
-                      icon: Icon(Icons.link_off,
-                          color: Colors.red.shade400,
-                          size: infoFontSize + 4),
-                      onPressed: () => _unlink(context, "Grandma Mary"),
+                    CircleAvatar(
+                      radius: 54.0,
+                      backgroundImage: _avatarImage ?? const AssetImage('assets/images/senior_profile.png'),
                     ),
-                  ),
-                )
-              else
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Guardian: Jane Smith",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: titleFontSize + 2,
-                      color: Colors.teal.shade900,
+                    const SizedBox(height: 20.0),
+                    Text(
+                      _data!['name'] ?? 'John Doe',
+                      style: TextStyle(
+                        fontSize: titleFontSize + 8.0,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.teal.shade900,
+                      ),
                     ),
-                  ),
-                ),
-
-              const SizedBox(height: 24),
-
-              // ✅ Logout Button with Confirmation
-              ElevatedButton.icon(
-                onPressed: () async {
-                  final confirm = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Confirm Logout'),
-                      content:
-                          const Text('Are you sure you want to log out?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, false),
-                          child: const Text('Cancel'),
+                    const SizedBox(height: 6.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Age: ${_data!['age'] ?? 0}',
+                          style: TextStyle(color: Colors.teal.shade800, fontSize: subtitleFontSize),
                         ),
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, true),
-                          child: const Text('Logout'),
+                        const SizedBox(width: 20.0),
+                        Text(
+                          'Height: ${_data!['height'] ?? 0} cm',
+                          style: TextStyle(color: Colors.teal.shade800, fontSize: subtitleFontSize),
+                        ),
+                        const SizedBox(width: 20.0),
+                        Text(
+                          'Weight: ${_data!['weight'] ?? 0} kg',
+                          style: TextStyle(color: Colors.green.shade800, fontSize: subtitleFontSize),
                         ),
                       ],
                     ),
-                  );
-
-                  if (confirm == true) {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/login',
-                      (route) => false,
-                    );
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("You have been logged out."),
-                        backgroundColor: Colors.teal,
+                    const SizedBox(height: 28.0),
+                    _sectionCard(
+                      width: screenWidth * 0.9,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _infoRow('Email', _data!['email'] ?? '', infoFontSize),
+                          _infoRow('Phone', _data!['phone'] ?? '', infoFontSize),
+                          _infoRow('IC/Passport', _data!['icPassport'] ?? '', infoFontSize),
+                        ],
                       ),
-                    );
-                  }
-                },
-                icon: const Icon(Icons.logout, color: Colors.white),
-                label: const Text(
-                  "Logout",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal.shade700,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                    ),
+                    _sectionCard(
+                      width: screenWidth * 0.9,
+                      child: _infoBlock(
+                        'Allergies',
+                        List<String>.from((_data!['allergyHistory'] as String?)?.split(',') ?? []),
+                        titleFontSize,
+                        infoFontSize,
+                      ),
+                    ),
+                    _sectionCard(
+                      width: screenWidth * 0.9,
+                      child: _infoBlock(
+                        'Medical History',
+                        List<String>.from((_data!['medicalHistory'] as String?)?.split(',') ?? []),
+                        titleFontSize,
+                        infoFontSize,
+                      ),
+                    ),
+                    _sectionCard(
+                      width: screenWidth * 0.9,
+                      child: _infoBlock(
+                        'Insurance & Family Doctor',
+                        [
+                          'Insurance: ${_data!['insurancePlan'] ?? ''}',
+                          'Family Doctor: ${_data!['familyDoctor'] ?? ''}',
+                        ],
+                        titleFontSize,
+                        infoFontSize,
+                      ),
+                    ),
+                    _sectionCard(
+                      width: screenWidth * 0.9,
+                      child: _infoBlock(
+                        'Emergency Contact',
+                        [_data!['emergencyContact'] ?? ''],
+                        titleFontSize,
+                        infoFontSize,
+                      ),
+                    ),
+                    const SizedBox(height: 24.0),
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Confirm Logout'),
+                            content: const Text('Are you sure you want to log out?'),
+                            actions: [
+                              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                              TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Logout')),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true) {
+                          Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('You have been logged out.'), backgroundColor: Colors.teal),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.logout, color: Colors.white),
+                      label: const Text('Logout', style: TextStyle(fontWeight: FontWeight.bold)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal.shade700,
+                        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 14.0),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

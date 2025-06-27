@@ -67,7 +67,7 @@ Future<void> main() async {
 }
 
 class CarePlusApp extends StatelessWidget {
-  const CarePlusApp({Key? key}) : super(key: key);
+  const CarePlusApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +121,7 @@ class AppRoutes {
 
 /// MainScaffold 放在 main.dart 中或单独文件
 class MainScaffold extends StatefulWidget {
-  const MainScaffold({Key? key}) : super(key: key);
+  const MainScaffold({super.key});
 
   @override
   _MainScaffoldState createState() => _MainScaffoldState();
