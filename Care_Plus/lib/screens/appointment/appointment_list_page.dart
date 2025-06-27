@@ -1,10 +1,12 @@
+// lib/screens/appointment/appointment_list_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../viewmodels/appointment_viewmodel.dart';
 import 'appointment_edit_page.dart';
 
 class AppointmentListPage extends StatelessWidget {
-  const AppointmentListPage({super.key});
+  const AppointmentListPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +20,24 @@ class AppointmentListPage extends StatelessWidget {
                 itemCount: vm.appointments.length,
                 itemBuilder: (_, i) {
                   final appt = vm.appointments[i];
+                  // 拆分 Hospital – Doctor
+                  final parts = appt.patientName.split(' - ');
+                  final hospital = parts.isNotEmpty ? parts[0] : '';
+                  final doctor = parts.length > 1 ? parts[1] : '';
                   return ListTile(
-                    title: Text(appt.patientName),
-                    subtitle: Text(_formatDateTime(appt.dateTime)),
+                    leading: const Icon(
+                      Icons.local_hospital,
+                      color: Colors.teal,
+                    ),
+                    title: Text(
+                      hospital,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      '$doctor\n${_formatDateTime(appt.dateTime)}',
+                      style: const TextStyle(height: 1.4),
+                    ),
+                    isThreeLine: true,
                     onTap:
                         () => Navigator.push(
                           context,
@@ -51,7 +68,7 @@ class AppointmentListPage extends StatelessWidget {
                                   (_) => AlertDialog(
                                     title: const Text('Confirm Deletion'),
                                     content: Text(
-                                      'Delete ${appt.patientName} (${_formatDateTime(appt.dateTime)})?',
+                                      'Delete appointment at $hospital with $doctor?',
                                     ),
                                     actions: [
                                       TextButton(

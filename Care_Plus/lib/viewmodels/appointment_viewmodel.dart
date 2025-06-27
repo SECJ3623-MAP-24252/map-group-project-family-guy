@@ -1,3 +1,6 @@
+// lib/viewmodels/appointment_viewmodel.dart
+
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -7,28 +10,29 @@ import '../services/appointment_repository.dart';
 class AppointmentViewModel extends ChangeNotifier {
   final AppointmentRepository _repo = AppointmentRepository();
   final FlutterLocalNotificationsPlugin _notifier;
+  StreamSubscription<List<Appointment>>? _sub;
 
   List<Appointment> appointments = [];
-  bool isLoading = false;
+  bool isLoading = true;
 
   AppointmentViewModel(this._notifier) {
-    loadAppointments();
+    // 实时订阅
+    _sub = _repo.watchAll().listen((list) {
+      appointments = list;
+      isLoading = false;
+      notifyListeners();
+    });
   }
 
-  Future<void> loadAppointments() async {
-    isLoading = true;
-    notifyListeners();
-
-    appointments = await _repo.fetchAll();
-
-    isLoading = false;
-    notifyListeners();
+  @override
+  void dispose() {
+    _sub?.cancel();
+    super.dispose();
   }
 
   Future<void> addAppointment(Appointment appt) async {
     await _repo.add(appt);
-
-    // 1) Immediate notification
+    // 立刻与定时通知逻辑不变…
     await _notifier.show(
       appt.hashCode,
       'Appointment Created',
@@ -43,12 +47,11 @@ class AppointmentViewModel extends ChangeNotifier {
       ),
     );
 
-    // 2) Scheduled notification
     final tzDate = tz.TZDateTime.from(appt.dateTime, tz.local);
     await _notifier.zonedSchedule(
       appt.hashCode,
       'Appointment Reminder',
-      'It is now time for ${appt.patientName}\'s appointment',
+      'Time for ${appt.patientName}',
       tzDate,
       const NotificationDetails(
         android: AndroidNotificationDetails(
@@ -62,18 +65,14 @@ class AppointmentViewModel extends ChangeNotifier {
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime,
     );
-
-    await loadAppointments();
   }
 
   Future<void> updateAppointment(Appointment appt) async {
     await _repo.update(appt);
-    await loadAppointments();
   }
 
   Future<void> deleteAppointment(String id) async {
     await _repo.delete(id);
-    await loadAppointments();
   }
 
   String _formatDateTime(DateTime dt) {
