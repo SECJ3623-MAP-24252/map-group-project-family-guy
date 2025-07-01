@@ -8,6 +8,7 @@ import 'package:timezone/timezone.dart' as tz;
 
 import 'screens/relative/chat.dart';
 import 'viewmodels/appointment_viewmodel.dart';
+import 'viewmodels/medicine_viewmodel.dart'; // ✅ Tambahan
 import 'screens/home/homepage_screen.dart' as home_page;
 import 'screens/home/nearby_hospitals_screen.dart';
 import 'screens/home/old_homepage_screen.dart';
@@ -16,6 +17,8 @@ import 'screens/login/signup_screen.dart';
 import 'screens/profile/profile_screen.dart' as profile_page;
 import 'screens/profile/profile_edit_screen.dart';
 import 'shared/splash_screen.dart';
+import 'screens/appointment/appointment_list_page.dart';
+import 'screens/relative/relative_list_page.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -25,14 +28,14 @@ Future<void> main() async {
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: '...',
-        authDomain: '...',
-        databaseURL: '...',
-        projectId: '...',
-        storageBucket: '...',
-        messagingSenderId: '...',
-        appId: '...',
-        measurementId: '...',
+        apiKey: "AIzaSyBuipbmUvwBrYmtky-RH6519YIFoj9FWoI",
+        authDomain: "careplus-c1a15.firebaseapp.com",
+        databaseURL: "https://careplus-c1a15-default-rtdb.firebaseio.com",
+        projectId: "careplus-c1a15",
+        storageBucket: "careplus-c1a15.firebasestorage.app",
+        messagingSenderId: "285406731152",
+        appId: "1:285406731152:web:e82d4b75e0d7718a2c3115",
+        measurementId: "G-EYE0W03VLZ",
       ),
     );
   } else {
@@ -54,13 +57,20 @@ Future<void> main() async {
   );
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin
-      >()
+          AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AppointmentViewModel(flutterLocalNotificationsPlugin),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) =>
+              AppointmentViewModel(flutterLocalNotificationsPlugin),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => MedicineViewModel(), // ✅ Provider tambahan
+        ),
+      ],
       child: const CarePlusApp(),
     ),
   );
@@ -81,15 +91,13 @@ class CarePlusApp extends StatelessWidget {
         AppRoutes.login: (c) => const LoginScreen(),
         AppRoutes.main: (c) => const MainScaffold(),
         AppRoutes.profile: (c) => const profile_page.ProfileScreen(),
-        AppRoutes.loading:
-            (c) => SplashScreen(
+        AppRoutes.loading: (c) => SplashScreen(
               onFinished: () {
                 Navigator.of(c).pushReplacementNamed(AppRoutes.main);
               },
             ),
-        AppRoutes.contactRelatives:
-            (c) =>
-                const ChatPage(name: 'son', imagePath: 'assets/images/man.png'),
+        AppRoutes.contactRelatives: (c) => const ChatPage(
+            name: 'son', imagePath: 'assets/images/man.png'),
         AppRoutes.profileEdit: (c) {
           final args =
               ModalRoute.of(c)?.settings.arguments as Map<String, dynamic>?;
@@ -98,10 +106,8 @@ class CarePlusApp extends StatelessWidget {
           );
         },
       },
-      onUnknownRoute:
-          (_) => MaterialPageRoute(
-            builder:
-                (_) => const Scaffold(
+      onUnknownRoute: (_) => MaterialPageRoute(
+            builder: (_) => const Scaffold(
                   body: Center(child: Text("404 - Page Not Found")),
                 ),
           ),
@@ -119,7 +125,6 @@ class AppRoutes {
   static const contactRelatives = '/contact-relatives';
 }
 
-/// MainScaffold 放在 main.dart 中或单独文件
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
 
@@ -128,38 +133,126 @@ class MainScaffold extends StatefulWidget {
 }
 
 class _MainScaffoldState extends State<MainScaffold> {
-  int _currentIndex = 2;
+  int _currentIndex = 0;
 
   final List<Widget> _pages = [
-    NearbyHospitalsScreen(),
-    Center(child: Icon(Icons.search)),
     home_page.HomepageScreen(),
-    const ChatPage(name: 'son', imagePath: 'assets/images/man.png'),
-    OldHomepageScreen(),
+    AppointmentListPage(),
+    RelativeListPage(),
+    profile_page.ProfileScreen(),
   ];
 
   void _onTap(int idx) => setState(() => _currentIndex = idx);
+
+  void _goToOldHomepage() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => OldHomepageScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onTap,
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_hospital),
-            label: 'Nearby',
+      floatingActionButton: FloatingActionButton(
+        onPressed: _goToOldHomepage,
+        backgroundColor: Theme.of(context).primaryColor,
+        child: const Icon(Icons.apps, color: Colors.purple, size: 32),
+        elevation: 6,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8.0,
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Expanded(
+                child: InkWell(
+                  onTap: () => _onTap(0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.home,
+                          color: _currentIndex == 0
+                              ? Theme.of(context).primaryColor
+                              : Colors.grey),
+                      Text('Home',
+                          style: TextStyle(
+                              color: _currentIndex == 0
+                                  ? Theme.of(context).primaryColor
+                                  : Colors.grey)),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: () => _onTap(1),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.calendar_today,
+                          color: _currentIndex == 1
+                              ? Theme.of(context).primaryColor
+                              : Colors.grey),
+                      Text('Appointments',
+                          style: TextStyle(
+                              color: _currentIndex == 1
+                                  ? Theme.of(context).primaryColor
+                                  : Colors.grey)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 56),
+              Expanded(
+                child: InkWell(
+                  onTap: () => _onTap(2),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.chat,
+                          color: _currentIndex == 2
+                              ? Theme.of(context).primaryColor
+                              : Colors.grey),
+                      Text('Chat',
+                          style: TextStyle(
+                              color: _currentIndex == 2
+                                  ? Theme.of(context).primaryColor
+                                  : Colors.grey)),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: () => _onTap(3),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.person,
+                          color: _currentIndex == 3
+                              ? Theme.of(context).primaryColor
+                              : Colors.grey),
+                      Text('Profile',
+                          style: TextStyle(
+                              color: _currentIndex == 3
+                                  ? Theme.of(context).primaryColor
+                                  : Colors.grey)),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-          BottomNavigationBarItem(icon: Icon(Icons.more_horiz), label: 'More'),
-        ],
+        ),
       ),
     );
   }

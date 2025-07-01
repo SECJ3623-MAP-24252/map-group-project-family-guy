@@ -1,76 +1,47 @@
-// lib/widgets/appointment_card.dart
-
 import 'package:flutter/material.dart';
+import '../../models/appointment_model.dart';
 
 class AppointmentCard extends StatelessWidget {
-  final String patientName;
-  final String hospitalName;
-  final String doctorName;
-  final String date;
-  final String time;
-  final IconData icon;
-  final String location;
-  final String note;
-
-  const AppointmentCard({
-    Key? key,
-    required this.patientName,
-    required this.hospitalName,
-    required this.doctorName,
-    required this.date,
-    required this.time,
-    required this.icon,
-    required this.location,
-    required this.note,
-  }) : super(key: key);
+  final Appointment appointment;
+  const AppointmentCard({super.key, required this.appointment});
 
   @override
   Widget build(BuildContext context) {
+    final parts = appointment.patientName.split(' - ');
+    final hospital = parts.isNotEmpty ? parts[0] : '-';
+    final doctor = parts.length > 1 ? parts[1] : '-';
+
+    final formattedDate =
+        '${appointment.dateTime.year}-${appointment.dateTime.month.toString().padLeft(2, '0')}-${appointment.dateTime.day.toString().padLeft(2, '0')}';
+    final formattedTime =
+        '${appointment.dateTime.hour.toString().padLeft(2, '0')}:${appointment.dateTime.minute.toString().padLeft(2, '0')}';
+
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      color: const Color(0xFFE7F9E7),
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 10),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              leading: Icon(icon, size: 36, color: Colors.green[800]),
-              title: Text(
-                '$patientName with $doctorName at $hospitalName',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              subtitle: Text("$date • $time"),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            ),
-            const SizedBox(height: 6),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Location: $location",
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    "Note: $note",
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+      color: const Color(0xFFD1F6D3),
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: ListTile(
+        leading: const Icon(Icons.local_hospital, size: 32, color: Colors.teal),
+        title: Text(
+          hospital,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Dr. $doctor'),
+              const SizedBox(height: 4),
+              Text('$formattedDate • $formattedTime'),
+            ],
+          ),
+        ),
+        trailing: const Icon(Icons.chevron_right, color: Colors.black54),
+        onTap: () {
+          // TODO: Tambahkan navigasi detail jika perlu
+        },
       ),
     );
   }

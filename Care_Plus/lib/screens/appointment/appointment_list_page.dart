@@ -99,14 +99,17 @@ class AppointmentListPage extends StatelessWidget {
                   );
                 },
               ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed:
             () => Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const AppointmentEditPage()),
             ),
-        child: const Icon(Icons.add),
-        tooltip: 'Add Appointment',
+        icon: const Icon(Icons.add),
+        label: const Text('Add Appointment'),
+        backgroundColor: Colors.teal,
+        foregroundColor: Colors.white,
+        elevation: 6,
       ),
     );
   }

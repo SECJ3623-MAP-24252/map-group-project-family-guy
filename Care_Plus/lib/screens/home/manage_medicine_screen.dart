@@ -1,7 +1,5 @@
-// ignore_for_file: library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ManageMedicineScreen extends StatefulWidget {
   const ManageMedicineScreen({super.key});
@@ -18,6 +16,12 @@ class _ManageMedicineScreenState extends State<ManageMedicineScreen> {
   final List<Map<String, dynamic>> _medications = [];
   bool _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    fetchMedicationsFromFirestore(); // ✅ load data saat halaman dibuka
+  }
+
   Future<void> _pickTime(BuildContext context) async {
     final TimeOfDay? picked =
         await showTimePicker(context: context, initialTime: TimeOfDay.now());
@@ -28,29 +32,82 @@ class _ManageMedicineScreenState extends State<ManageMedicineScreen> {
     }
   }
 
-  void _addMedication() {
+  Future<void> fetchMedicationsFromFirestore() async {
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('medicines')
+          .orderBy('createdAt', descending: true)
+          .get();
+
+      final List<Map<String, dynamic>> loadedMeds = [];
+
+      for (var doc in querySnapshot.docs) {
+        final data = doc.data();
+        loadedMeds.add({
+          'docId': doc.id,
+          'name': data['name'],
+          'dose': data['dose'],
+          'times': List<String>.from(data['times']),
+        });
+      }
+
+      setState(() {
+        _medications.clear();
+        _medications.addAll(loadedMeds);
+      });
+    } catch (e) {
+      debugPrint('Error fetching meds: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to load medication data')),
+      );
+    }
+  }
+
+  Future<void> saveMedicationToFirestore(Map<String, dynamic> medicationData) async {
+    try {
+      final docRef = await FirebaseFirestore.instance
+          .collection('medicines')
+          .add(medicationData);
+      debugPrint('Saved to Firestore');
+
+      setState(() {
+        _medications.insert(0, {
+          ...medicationData,
+          'docId': docRef.id,
+        });
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Medication added successfully")),
+      );
+    } catch (e) {
+      debugPrint('Failed to save to Firestore: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to save to Firestore')),
+      );
+    }
+  }
+
+  Future<void> _addMedication() async {
     if (_formKey.currentState!.validate() && _selectedTimes.isNotEmpty) {
       setState(() => _isLoading = true);
 
-      Future.delayed(const Duration(milliseconds: 500), () {
-        final timeStrings = _selectedTimes.map((t) => t.format(context)).toList();
+      final timeStrings = _selectedTimes.map((t) => t.format(context)).toList();
 
-        _medications.add({
-          'name': _nameController.text,
-          'dose': _doseController.text,
-          'times': timeStrings,
-        });
+      final medicationData = {
+        'name': _nameController.text,
+        'dose': _doseController.text,
+        'times': timeStrings,
+        'createdAt': Timestamp.now(),
+      };
 
-        _nameController.clear();
-        _doseController.clear();
-        _selectedTimes.clear();
+      await saveMedicationToFirestore(medicationData);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Medication added successfully")),
-        );
+      _nameController.clear();
+      _doseController.clear();
+      _selectedTimes.clear();
 
-        setState(() => _isLoading = false);
-      });
+      setState(() => _isLoading = false);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please fill all fields and add at least one time.')),
@@ -58,14 +115,28 @@ class _ManageMedicineScreenState extends State<ManageMedicineScreen> {
     }
   }
 
-  void _removeMedication(int index) {
-    setState(() {
-      _medications.removeAt(index);
-    });
+  Future<void> _removeMedication(int index) async {
+    final docId = _medications[index]['docId'];
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Medication deleted")),
-    );
+    try {
+      await FirebaseFirestore.instance
+          .collection('medicines')
+          .doc(docId)
+          .delete();
+
+      setState(() {
+        _medications.removeAt(index);
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Medication deleted")),
+      );
+    } catch (e) {
+      debugPrint('Error deleting: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Failed to delete from Firestore")),
+      );
+    }
   }
 
   @override
@@ -239,7 +310,7 @@ class _ManageMedicineScreenState extends State<ManageMedicineScreen> {
                               );
 
                               if (confirm == true) {
-                                _removeMedication(index);
+                                await _removeMedication(index);
                               }
                             },
                           ),

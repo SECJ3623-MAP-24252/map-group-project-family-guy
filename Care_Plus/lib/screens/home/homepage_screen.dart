@@ -4,13 +4,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
 import '../appointment/appointment_list_page.dart';
-import 'package:Care_Plus/screens/document/document_screen.dart';
 import 'package:Care_Plus/screens/relative/chat.dart';
-import 'package:Care_Plus/screens/home/old_homepage_screen.dart';
 import 'package:Care_Plus/widgets/action_button.dart';
 import '../../viewmodels/appointment_viewmodel.dart';
+import '../../viewmodels/medicine_viewmodel.dart';
+import '../../widgets/medicine_card.dart';
+import '../../widgets/appointment_card.dart';
+import 'manage_medicine_screen.dart';
+import '../appointment/appointment_edit_page.dart';
 
-/// Home page body
 class HomepageScreen extends StatefulWidget {
   const HomepageScreen({Key? key}) : super(key: key);
 
@@ -25,19 +27,24 @@ class _HomepageScreenState extends State<HomepageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final quickSendList = [
+    final medicineVM = Provider.of<MedicineViewModel>(context);
+    final appointmentVM = Provider.of<AppointmentViewModel>(context);
+
+    const relatives = [
       {'name': 'Son', 'image': 'assets/images/man.png'},
+      {'name': 'Daughter', 'image': 'assets/images/woman.png'},
     ];
+    const double avatarSize = 64;
 
     return SafeArea(
       child: Container(
-        color: const Color(0xFFF1FDF2), // page background
+        color: const Color(0xFFF1FDF2),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header + Profile
+              // -------------------- Profile Card --------------------
               StreamBuilder<DocumentSnapshot>(
                 stream: _profileDoc.snapshots(),
                 builder: (context, snap) {
@@ -55,308 +62,263 @@ class _HomepageScreenState extends State<HomepageScreen> {
                       avatar = MemoryImage(base64Decode(data['avatarBase64']));
                     }
                     name = data['name'] ?? name;
-                    age =
-                        (data['age'] is int)
-                            ? data['age']
-                            : int.tryParse(data['age'].toString()) ?? age;
+                    age = (data['age'] is int)
+                        ? data['age']
+                        : int.tryParse(data['age'].toString()) ?? age;
                     phone = data['phone'] ?? phone;
                     email = data['email'] ?? email;
                   }
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // top row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  return Card(
+                    elevation: 6,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    margin: const EdgeInsets.only(bottom: 24),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Row(
                         children: [
-                          Row(
-                            children: [
-                              GestureDetector(
-                                onTap:
-                                    () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (_) =>
-                                                const profile_page.ProfileScreen(),
+                          CircleAvatar(
+                            radius: 36,
+                            backgroundImage: avatar,
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        name,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
-                                child: CircleAvatar(
-                                  radius: 24,
-                                  backgroundImage: avatar,
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    name,
-                                    style: const TextStyle(fontSize: 16),
-                                  ),
-                                  const Text(
-                                    'Welcome Back 👋',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
+                                    IconButton(
+                                      icon: const Icon(Icons.edit, color: Colors.teal),
+                                      onPressed: () => Navigator.pushNamed(context, '/profile/edit'),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          const Icon(
-                            Icons.notifications,
-                            color: Colors.black54,
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.cake, size: 18, color: Colors.grey),
+                                    const SizedBox(width: 4),
+                                    Text('Age: $age'),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.phone, size: 18, color: Colors.grey),
+                                    const SizedBox(width: 4),
+                                    Text(phone),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.email, size: 18, color: Colors.grey),
+                                    const SizedBox(width: 4),
+                                    Text(email),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
-                      // profile card
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black87,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        padding: const EdgeInsets.all(20),
-                        child: Row(
-                          children: [
-                            CircleAvatar(radius: 30, backgroundImage: avatar),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    name,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Age: $age',
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Phone: $phone',
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Email: $email',
-                                    style: const TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
+                    ),
                   );
                 },
               ),
 
-              // Action Buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ActionButton(
-                    icon: Icons.send,
-                    label: 'Appointment',
-                    onTap:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AppointmentListPage(),
-                          ),
-                        ),
-                  ),
-                  ActionButton(
-                    icon: Icons.receipt_long,
-                    label: 'Documents',
-                    onTap:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const HealthDataPage(),
-                          ),
-                        ),
-                  ),
-                  ActionButton(
-                    icon: Icons.phone_android,
-                    label: 'Relative',
-                    onTap:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder:
-                                (_) => const ChatPage(
-                                  name: 'Son',
-                                  imagePath: 'assets/images/man.png',
-                                ),
-                          ),
-                        ),
-                  ),
-                  ActionButton(
-                    icon: Icons.more_horiz,
-                    label: 'More',
-                    highlight: true,
-                    onTap:
-                        () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => OldHomepageScreen(),
-                          ),
-                        ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Quick Send
+              // -------------------- Contact Relatives --------------------
               const Text(
-                'Quick Send',
+                'Contact Relatives',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               SizedBox(
-                height: 80,
-                child: ListView(
+                height: avatarSize + 40,
+                child: ListView.separated(
                   scrollDirection: Axis.horizontal,
-                  children:
-                      quickSendList.map((item) {
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 12.0),
-                          child: Column(
-                            children: [
-                              CircleAvatar(
-                                backgroundImage: AssetImage(item['image']!),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(item['name']!),
-                            ],
+                  itemCount: relatives.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (context, index) {
+                    final relative = relatives[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ChatPage(
+                              name: relative['name']!,
+                              imagePath: relative['image']!,
+                            ),
                           ),
                         );
-                      }).toList(),
+                      },
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: avatarSize / 2,
+                            backgroundImage: AssetImage(relative['image']!),
+                          ),
+                          const SizedBox(height: 6),
+                          SizedBox(
+                            width: avatarSize + 10,
+                            child: Text(
+                              relative['name']!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontWeight: FontWeight.w600),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
 
-              // Recent Appointments — 卡片式展示
+              // -------------------- Upcoming Appointments --------------------
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Recent Appointments',
+                    'Upcoming Appointments',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  TextButton(
-                    onPressed:
-                        () => Navigator.push(
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.add_circle, color: Colors.teal),
+                        tooltip: 'Add Appointment',
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const AppointmentEditPage(),
+                          ),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (_) => const AppointmentListPage(),
                           ),
                         ),
-                    child: const Text('See All'),
+                        child: const Text('See All'),
+                      ),
+                    ],
                   ),
                 ],
               ),
               const SizedBox(height: 12),
-              Consumer<AppointmentViewModel>(
-                builder: (context, vm, _) {
-                  if (vm.isLoading) {
+              if (appointmentVM.isLoading)
+                const Center(child: CircularProgressIndicator())
+              else if (appointmentVM.appointments.isEmpty)
+                const Text('No upcoming appointments.')
+              else
+                Column(
+                  children: appointmentVM.appointments
+                      .toList()
+                      .take(3)
+                      .map((appt) => AppointmentCard(appointment: appt))
+                      .toList(),
+                ),
+
+              const SizedBox(height: 32),
+
+              // -------------------- Recent Medicines --------------------
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Recent Medicines',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.add_circle, color: Colors.teal),
+                        tooltip: 'Add Medicine',
+                        onPressed: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ManageMedicineScreen()),
+                          );
+                        },
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const ManageMedicineScreen()),
+                          );
+                        },
+                        child: const Text('See All'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              StreamBuilder(
+                stream: medicineVM.medicinesStream,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
-                  final recent = List.of(vm.appointments)
-                    ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
-                  if (recent.isEmpty) {
-                    return const Text('No upcoming appointments.');
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Text('No medicines scheduled.');
                   }
-                  return Column(
-                    children:
-                        recent.take(3).map((appt) {
-                          final parts = appt.patientName.split(' - ');
-                          final hospital = parts.isNotEmpty ? parts[0] : '';
-                          final doctor = parts.length > 1 ? parts[1] : '';
-                          final formatted =
-                              '${appt.dateTime.year}-${appt.dateTime.month.toString().padLeft(2, '0')}-${appt.dateTime.day.toString().padLeft(2, '0')} '
-                              '${appt.dateTime.hour.toString().padLeft(2, '0')}:${appt.dateTime.minute.toString().padLeft(2, '0')}';
-                          return Card(
-                            color: const Color.fromARGB(
-                              255,
-                              209,
-                              246,
-                              211,
-                            ), // card background
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 2,
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              leading: const Icon(
-                                Icons.local_hospital,
-                                size: 32,
-                                color: Colors.teal,
-                              ),
-                              title: Text(
-                                hospital,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: Padding(
-                                padding: const EdgeInsets.only(top: 4),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Dr. $doctor'),
-                                    const SizedBox(height: 4),
-                                    Text(formatted),
-                                  ],
-                                ),
-                              ),
-                              trailing: IconButton(
-                                icon: const Icon(
-                                  Icons.chevron_right,
-                                  color: Colors.black54,
-                                ),
-                                onPressed:
-                                    () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder:
-                                            (_) => const AppointmentListPage(),
-                                      ),
-                                    ),
-                              ),
-                            ),
+
+                  final docs = snapshot.data!.docs.take(3).toList();
+
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: docs.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    itemBuilder: (context, index) {
+                      final doc = docs[index];
+                      final data = doc.data() as Map<String, dynamic>;
+                      final name = data['name'] ?? '-';
+                      final dose = data['dose'] ?? '-';
+                      final times = (data['times'] as List).join(', ');
+
+                      return MedicineCard(
+                        name: name,
+                        dose: dose,
+                        times: times,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const ManageMedicineScreen()),
+                        ),
+                        onDismissed: (_) async {
+                          await medicineVM.deleteMedicine(doc.id);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Medicine deleted')),
                           );
-                        }).toList(),
+                        },
+                      );
+                    },
                   );
                 },
               ),
+
+              const SizedBox(height: 32),
             ],
           ),
         ),
