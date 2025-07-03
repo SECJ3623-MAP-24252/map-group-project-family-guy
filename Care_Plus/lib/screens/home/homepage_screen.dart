@@ -62,9 +62,10 @@ class _HomepageScreenState extends State<HomepageScreen> {
                       avatar = MemoryImage(base64Decode(data['avatarBase64']));
                     }
                     name = data['name'] ?? name;
-                    age = (data['age'] is int)
-                        ? data['age']
-                        : int.tryParse(data['age'].toString()) ?? age;
+                    age =
+                        (data['age'] is int)
+                            ? data['age']
+                            : int.tryParse(data['age'].toString()) ?? age;
                     phone = data['phone'] ?? phone;
                     email = data['email'] ?? email;
                   }
@@ -79,10 +80,7 @@ class _HomepageScreenState extends State<HomepageScreen> {
                       padding: const EdgeInsets.all(20),
                       child: Row(
                         children: [
-                          CircleAvatar(
-                            radius: 36,
-                            backgroundImage: avatar,
-                          ),
+                          CircleAvatar(radius: 36, backgroundImage: avatar),
                           const SizedBox(width: 20),
                           Expanded(
                             child: Column(
@@ -100,15 +98,26 @@ class _HomepageScreenState extends State<HomepageScreen> {
                                       ),
                                     ),
                                     IconButton(
-                                      icon: const Icon(Icons.edit, color: Colors.teal),
-                                      onPressed: () => Navigator.pushNamed(context, '/profile/edit'),
+                                      icon: const Icon(
+                                        Icons.edit,
+                                        color: Colors.teal,
+                                      ),
+                                      onPressed:
+                                          () => Navigator.pushNamed(
+                                            context,
+                                            '/profile/edit',
+                                          ),
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
-                                    const Icon(Icons.cake, size: 18, color: Colors.grey),
+                                    const Icon(
+                                      Icons.cake,
+                                      size: 18,
+                                      color: Color.fromARGB(255, 158, 158, 158),
+                                    ),
                                     const SizedBox(width: 4),
                                     Text('Age: $age'),
                                   ],
@@ -116,7 +125,11 @@ class _HomepageScreenState extends State<HomepageScreen> {
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    const Icon(Icons.phone, size: 18, color: Colors.grey),
+                                    const Icon(
+                                      Icons.phone,
+                                      size: 18,
+                                      color: Colors.grey,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(phone),
                                   ],
@@ -124,7 +137,11 @@ class _HomepageScreenState extends State<HomepageScreen> {
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
-                                    const Icon(Icons.email, size: 18, color: Colors.grey),
+                                    const Icon(
+                                      Icons.email,
+                                      size: 18,
+                                      color: Colors.grey,
+                                    ),
                                     const SizedBox(width: 4),
                                     Text(email),
                                   ],
@@ -158,10 +175,11 @@ class _HomepageScreenState extends State<HomepageScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => ChatPage(
-                              name: relative['name']!,
-                              imagePath: relative['image']!,
-                            ),
+                            builder:
+                                (_) => ChatPage(
+                                  name: relative['name']!,
+                                  imagePath: relative['image']!,
+                                ),
                           ),
                         );
                       },
@@ -177,7 +195,9 @@ class _HomepageScreenState extends State<HomepageScreen> {
                             child: Text(
                               relative['name']!,
                               textAlign: TextAlign.center,
-                              style: const TextStyle(fontWeight: FontWeight.w600),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                             ),
@@ -203,20 +223,22 @@ class _HomepageScreenState extends State<HomepageScreen> {
                       IconButton(
                         icon: const Icon(Icons.add_circle, color: Colors.teal),
                         tooltip: 'Add Appointment',
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AppointmentEditPage(),
-                          ),
-                        ),
+                        onPressed:
+                            () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const AppointmentEditPage(),
+                              ),
+                            ),
                       ),
                       TextButton(
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const AppointmentListPage(),
-                          ),
-                        ),
+                        onPressed:
+                            () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const AppointmentListPage(),
+                              ),
+                            ),
                         child: const Text('See All'),
                       ),
                     ],
@@ -230,11 +252,12 @@ class _HomepageScreenState extends State<HomepageScreen> {
                 const Text('No upcoming appointments.')
               else
                 Column(
-                  children: appointmentVM.appointments
-                      .toList()
-                      .take(3)
-                      .map((appt) => AppointmentCard(appointment: appt))
-                      .toList(),
+                  children:
+                      appointmentVM.appointments
+                          .toList()
+                          .take(3)
+                          .map((appt) => AppointmentCard(appointment: appt))
+                          .toList(),
                 ),
 
               const SizedBox(height: 32),
@@ -255,7 +278,9 @@ class _HomepageScreenState extends State<HomepageScreen> {
                         onPressed: () async {
                           await Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const ManageMedicineScreen()),
+                            MaterialPageRoute(
+                              builder: (_) => const ManageMedicineScreen(),
+                            ),
                           );
                         },
                       ),
@@ -263,7 +288,9 @@ class _HomepageScreenState extends State<HomepageScreen> {
                         onPressed: () async {
                           await Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const ManageMedicineScreen()),
+                            MaterialPageRoute(
+                              builder: (_) => const ManageMedicineScreen(),
+                            ),
                           );
                         },
                         child: const Text('See All'),
@@ -302,10 +329,13 @@ class _HomepageScreenState extends State<HomepageScreen> {
                         name: name,
                         dose: dose,
                         times: times,
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const ManageMedicineScreen()),
-                        ),
+                        onTap:
+                            () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const ManageMedicineScreen(),
+                              ),
+                            ),
                         onDismissed: (_) async {
                           await medicineVM.deleteMedicine(doc.id);
                           ScaffoldMessenger.of(context).showSnackBar(

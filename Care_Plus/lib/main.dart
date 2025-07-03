@@ -1,4 +1,5 @@
 // main.dart (Updated with Contact functionality)
+import 'package:Care_Plus/screens/document/document.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -138,6 +139,7 @@ class AppRoutes {
   static const profileEdit = '/profile/edit';
   static const loading = '/loading';
   static const contacts = '/contacts';
+  static const document = '/document';
   static const contactRelatives = '/contact-relatives';
 }
 
@@ -156,6 +158,7 @@ class _MainScaffoldState extends State<MainScaffold> {
     AppointmentListPage(),
     ContactListScreen(),
     profile_page.ProfileScreen(),
+    HealthDataPage(),
   ];
 
   void _onTap(int idx) => setState(() => _currentIndex = idx);

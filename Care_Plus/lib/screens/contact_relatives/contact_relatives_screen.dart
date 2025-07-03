@@ -99,7 +99,7 @@ class HomepageScreen extends StatelessWidget {
                 _buildActionCard(context, Icons.receipt_long, 'Documents', () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const HealthDataPage()),
+                    MaterialPageRoute(builder: (_) => const HealthDataPage(profileId: '',)),
                   );
                 }),
                 _buildActionCard(context, Icons.phone_in_talk, 'Chat', () {

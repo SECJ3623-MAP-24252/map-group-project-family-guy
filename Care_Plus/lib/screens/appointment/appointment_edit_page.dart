@@ -37,7 +37,9 @@ class _AppointmentEditPageState extends State<AppointmentEditPage> {
   Widget build(BuildContext context) {
     final isEditing = widget.appt != null;
     return Scaffold(
+      backgroundColor: const Color(0xFFF1FDF2),
       appBar: AppBar(
+        backgroundColor: const Color(0xFFF1FDF2),
         title: Text(isEditing ? 'Edit Appointment' : 'New Appointment'),
       ),
       body: Padding(
@@ -85,7 +87,7 @@ class _AppointmentEditPageState extends State<AppointmentEditPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                tileColor: Colors.grey.shade200,
+                tileColor: const Color.fromARGB(255, 103, 172, 109),
                 title: Text(
                   'Date: ${_dateTime.year}-${_dateTime.month.toString().padLeft(2, '0')}-${_dateTime.day.toString().padLeft(2, '0')}',
                 ),
@@ -99,7 +101,12 @@ class _AppointmentEditPageState extends State<AppointmentEditPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                tileColor: Colors.grey.shade200,
+                tileColor: const Color.fromARGB(
+                  255,
+                  103,
+                  172,
+                  109,
+                ), //color: const Color(0xFFF1FDF2),
                 title: Text(
                   'Time: ${_dateTime.hour.toString().padLeft(2, '0')}:${_dateTime.minute.toString().padLeft(2, '0')}',
                 ),

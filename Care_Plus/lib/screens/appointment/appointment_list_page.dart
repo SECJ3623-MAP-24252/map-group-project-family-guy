@@ -12,7 +12,11 @@ class AppointmentListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final vm = context.watch<AppointmentViewModel>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Appointments')),
+      backgroundColor: const Color(0xFFF1FDF2),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFFF1FDF2),
+        title: const Text('Appointments'),
+      ),
       body:
           vm.isLoading
               ? const Center(child: CircularProgressIndicator())
@@ -108,7 +112,7 @@ class AppointmentListPage extends StatelessWidget {
         icon: const Icon(Icons.add),
         label: const Text('Add Appointment'),
         backgroundColor: Colors.teal,
-        foregroundColor: Colors.white,
+        foregroundColor: const Color(0xFFF1FDF2),
         elevation: 6,
       ),
     );
