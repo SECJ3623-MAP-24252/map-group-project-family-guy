@@ -4,7 +4,6 @@ import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
 import '../appointment/appointment_list_page.dart';
 import 'package:Care_Plus/screens/relative/chat.dart';
 
-
 class HomepageScreen extends StatelessWidget {
   const HomepageScreen({Key? key}) : super(key: key);
 
@@ -19,9 +18,7 @@ class HomepageScreen extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => profile_page.ProfileScreen(),
-              ),
+              MaterialPageRoute(builder: (_) => profile_page.ProfileScreen()),
             );
           },
           child: const Padding(
@@ -60,10 +57,7 @@ class HomepageScreen extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.1),
-                    blurRadius: 8,
-                  ),
+                  BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8),
                 ],
               ),
               child: const TextField(
@@ -84,35 +78,39 @@ class HomepageScreen extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               children: [
                 _buildActionCard(
-                    context, Icons.calendar_today, 'Appointments', () {
+                  context,
+                  Icons.calendar_today,
+                  'Appointments',
+                  () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => AppointmentListPage()),
+                    );
+                  },
+                ),
+                _buildActionCard(
+                  context,
+                  Icons.medication_outlined,
+                  'Medication',
+                  () {
+                    // TODO: navigate to medication log
+                  },
+                ),
+                _buildActionCard(context, Icons.receipt_long, 'Documents', () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => AppointmentListPage(),
-                    ),
-                  );
-                }),
-                _buildActionCard(
-                    context, Icons.medication_outlined, 'Medication', () {
-                  // TODO: navigate to medication log
-                }),
-                _buildActionCard(
-                    context, Icons.receipt_long, 'Documents', () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const HealthDataPage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => const HealthDataPage()),
                   );
                 }),
                 _buildActionCard(context, Icons.phone_in_talk, 'Chat', () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ChatPage(
-                        name: 'son',
-                        imagePath: 'assets/images/man.png',
-                      ),
+                      builder:
+                          (_) => ChatPage(
+                            name: 'son',
+                            imagePath: 'assets/images/man.png',
+                          ),
                     ),
                   );
                 }),
@@ -138,14 +136,10 @@ class HomepageScreen extends StatelessWidget {
                 children: const [
                   Text(
                     'Health Stats',
-                    style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 15),
-                  LinearProgressIndicator(
-                    value: 0.7,
-                    minHeight: 6,
-                  ),
+                  LinearProgressIndicator(value: 0.7, minHeight: 6),
                   SizedBox(height: 10),
                   Text('Daily Step Goal: 7,000 / 10,000'),
                   SizedBox(height: 10),
@@ -164,8 +158,16 @@ class HomepageScreen extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                _buildListTile(Icons.local_hospital, 'Clinic Visit', '15 Oct, 3:00 PM'),
-                _buildListTile(Icons.calendar_today, 'Doctor Appointment', '12 Oct, 10:00 AM'),
+                _buildListTile(
+                  Icons.local_hospital,
+                  'Clinic Visit',
+                  '15 Oct, 3:00 PM',
+                ),
+                _buildListTile(
+                  Icons.calendar_today,
+                  'Doctor Appointment',
+                  '12 Oct, 10:00 AM',
+                ),
               ],
             ),
             const SizedBox(height: 30),
@@ -176,7 +178,11 @@ class HomepageScreen extends StatelessWidget {
   }
 
   Widget _buildActionCard(
-      BuildContext context, IconData icon, String label, VoidCallback onTap) {
+    BuildContext context,
+    IconData icon,
+    String label,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -184,10 +190,7 @@ class HomepageScreen extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 8,
-            ),
+            BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8),
           ],
         ),
         padding: const EdgeInsets.all(20),

@@ -1,3 +1,4 @@
+// main.dart (Updated with Contact functionality)
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -7,8 +8,10 @@ import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
 import 'screens/relative/chat.dart';
+import 'screens/contacts/contact_list_screen.dart'; // New import
 import 'viewmodels/appointment_viewmodel.dart';
-import 'viewmodels/medicine_viewmodel.dart'; // ✅ Tambahan
+import 'viewmodels/medicine_viewmodel.dart';
+import 'viewmodels/contact_viewmodel.dart'; // New import
 import 'screens/home/homepage_screen.dart' as home_page;
 import 'screens/home/nearby_hospitals_screen.dart';
 import 'screens/home/old_homepage_screen.dart';
@@ -57,18 +60,19 @@ Future<void> main() async {
   );
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+        AndroidFlutterLocalNotificationsPlugin
+      >()
       ?.createNotificationChannel(channel);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) =>
-              AppointmentViewModel(flutterLocalNotificationsPlugin),
+          create: (_) => AppointmentViewModel(flutterLocalNotificationsPlugin),
         ),
+        ChangeNotifierProvider(create: (_) => MedicineViewModel()),
         ChangeNotifierProvider(
-          create: (_) => MedicineViewModel(), // ✅ Provider tambahan
+          create: (_) => ContactViewModel(), // New provider
         ),
       ],
       child: const CarePlusApp(),
@@ -91,13 +95,16 @@ class CarePlusApp extends StatelessWidget {
         AppRoutes.login: (c) => const LoginScreen(),
         AppRoutes.main: (c) => const MainScaffold(),
         AppRoutes.profile: (c) => const profile_page.ProfileScreen(),
-        AppRoutes.loading: (c) => SplashScreen(
+        AppRoutes.loading:
+            (c) => SplashScreen(
               onFinished: () {
                 Navigator.of(c).pushReplacementNamed(AppRoutes.main);
               },
             ),
-        AppRoutes.contactRelatives: (c) => const ChatPage(
-            name: 'son', imagePath: 'assets/images/man.png'),
+        AppRoutes.contacts: (c) => const ContactListScreen(), // New route
+        AppRoutes.contactRelatives:
+            (c) =>
+                const ChatPage(name: 'son', imagePath: 'assets/images/man.png'),
         AppRoutes.profileEdit: (c) {
           final args =
               ModalRoute.of(c)?.settings.arguments as Map<String, dynamic>?;
@@ -106,8 +113,10 @@ class CarePlusApp extends StatelessWidget {
           );
         },
       },
-      onUnknownRoute: (_) => MaterialPageRoute(
-            builder: (_) => const Scaffold(
+      onUnknownRoute:
+          (_) => MaterialPageRoute(
+            builder:
+                (_) => const Scaffold(
                   body: Center(child: Text("404 - Page Not Found")),
                 ),
           ),
@@ -122,6 +131,7 @@ class AppRoutes {
   static const profile = '/profile';
   static const profileEdit = '/profile/edit';
   static const loading = '/loading';
+  static const contacts = '/contacts'; // New route
   static const contactRelatives = '/contact-relatives';
 }
 
@@ -138,16 +148,16 @@ class _MainScaffoldState extends State<MainScaffold> {
   final List<Widget> _pages = [
     home_page.HomepageScreen(),
     AppointmentListPage(),
-    RelativeListPage(),
+    ContactListScreen(), // Changed from RelativeListPage to ContactListScreen
     profile_page.ProfileScreen(),
   ];
 
   void _onTap(int idx) => setState(() => _currentIndex = idx);
 
   void _goToOldHomepage() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => OldHomepageScreen()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => OldHomepageScreen()));
   }
 
   @override
@@ -176,15 +186,22 @@ class _MainScaffoldState extends State<MainScaffold> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.home,
-                          color: _currentIndex == 0
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey),
-                      Text('Home',
-                          style: TextStyle(
-                              color: _currentIndex == 0
+                      Icon(
+                        Icons.home,
+                        color:
+                            _currentIndex == 0
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey,
+                      ),
+                      Text(
+                        'Home',
+                        style: TextStyle(
+                          color:
+                              _currentIndex == 0
                                   ? Theme.of(context).primaryColor
-                                  : Colors.grey)),
+                                  : Colors.grey,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -196,15 +213,22 @@ class _MainScaffoldState extends State<MainScaffold> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.calendar_today,
-                          color: _currentIndex == 1
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey),
-                      Text('Appointments',
-                          style: TextStyle(
-                              color: _currentIndex == 1
+                      Icon(
+                        Icons.calendar_today,
+                        color:
+                            _currentIndex == 1
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey,
+                      ),
+                      Text(
+                        'Appointments',
+                        style: TextStyle(
+                          color:
+                              _currentIndex == 1
                                   ? Theme.of(context).primaryColor
-                                  : Colors.grey)),
+                                  : Colors.grey,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -217,15 +241,22 @@ class _MainScaffoldState extends State<MainScaffold> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.chat,
-                          color: _currentIndex == 2
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey),
-                      Text('Chat',
-                          style: TextStyle(
-                              color: _currentIndex == 2
+                      Icon(
+                        Icons.contacts, // Changed from chat to contacts
+                        color:
+                            _currentIndex == 2
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey,
+                      ),
+                      Text(
+                        'Contacts', // Changed from Chat to Contacts
+                        style: TextStyle(
+                          color:
+                              _currentIndex == 2
                                   ? Theme.of(context).primaryColor
-                                  : Colors.grey)),
+                                  : Colors.grey,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -237,15 +268,22 @@ class _MainScaffoldState extends State<MainScaffold> {
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.person,
-                          color: _currentIndex == 3
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey),
-                      Text('Profile',
-                          style: TextStyle(
-                              color: _currentIndex == 3
+                      Icon(
+                        Icons.person,
+                        color:
+                            _currentIndex == 3
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey,
+                      ),
+                      Text(
+                        'Profile',
+                        style: TextStyle(
+                          color:
+                              _currentIndex == 3
                                   ? Theme.of(context).primaryColor
-                                  : Colors.grey)),
+                                  : Colors.grey,
+                        ),
+                      ),
                     ],
                   ),
                 ),

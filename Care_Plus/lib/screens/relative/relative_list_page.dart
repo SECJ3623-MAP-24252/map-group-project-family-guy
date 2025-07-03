@@ -6,14 +6,8 @@ class RelativeListPage extends StatelessWidget {
   const RelativeListPage({Key? key}) : super(key: key);
 
   final List<Map<String, String>> relatives = const [
-    {
-      'name': 'Son',
-      'image': 'assets/images/man.png',
-    },
-    {
-      'name': 'Daughter',
-      'image': 'assets/images/woman.png',
-    },
+    {'name': 'Son', 'image': 'assets/images/man.png'},
+    {'name': 'Daughter', 'image': 'assets/images/woman.png'},
     // Tambahkan lagi jika perlu
   ];
 
@@ -37,7 +31,9 @@ class RelativeListPage extends StatelessWidget {
         itemBuilder: (context, index) {
           final relative = relatives[index];
           return ListTile(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
             tileColor: Colors.white,
             leading: CircleAvatar(
               backgroundImage: AssetImage(relative['image']!),
@@ -52,10 +48,11 @@ class RelativeListPage extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ChatPage(
-                    name: relative['name']!,
-                    imagePath: relative['image']!,
-                  ),
+                  builder:
+                      (_) => ChatPage(
+                        name: relative['name']!,
+                        imagePath: relative['image']!,
+                      ),
                 ),
               );
             },
