@@ -13,7 +13,7 @@ import 'viewmodels/appointment_viewmodel.dart';
 import 'viewmodels/medicine_viewmodel.dart';
 import 'viewmodels/contact_viewmodel.dart'; // New import
 import 'screens/home/homepage_screen.dart' as home_page;
-import 'screens/home/nearby_hospitals_screen.dart';
+//import 'screens/home/nearby_hospitals_screen.dart';
 import 'screens/home/old_homepage_screen.dart';
 import 'screens/login/login_screen.dart';
 import 'screens/login/signup_screen.dart';
@@ -23,11 +23,16 @@ import 'shared/splash_screen.dart';
 import 'screens/appointment/appointment_list_page.dart';
 import 'screens/relative/relative_list_page.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'package:Care_Plus/screens/hospital/hospital_map_logic.dart';
+import 'package:Care_Plus/screens/hospital/hospital_map_screen.dart';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+   await dotenv.load(); 
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
@@ -42,6 +47,8 @@ Future<void> main() async {
       ),
     );
   } else {
+    
+
     await Firebase.initializeApp();
   }
 
@@ -146,6 +153,11 @@ class _MainScaffoldState extends State<MainScaffold> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
+<<<<<<< HEAD
+=======
+    HospitalMapScreen(),
+    Center(child: Icon(Icons.search)),
+>>>>>>> 66066b2e12c1e959ac47d994ef6164037b9d2fcc
     home_page.HomepageScreen(),
     AppointmentListPage(),
     ContactListScreen(), // Changed from RelativeListPage to ContactListScreen
@@ -294,4 +306,4 @@ class _MainScaffoldState extends State<MainScaffold> {
       ),
     );
   }
-}
+} 
