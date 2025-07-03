@@ -37,12 +37,28 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
         apiKey: "AIzaSyBuipbmUvwBrYmtky-RH6519YIFoj9FWoI",
+<<<<<<< Updated upstream
         authDomain: "careplus-c1a15.firebaseapp.com",
         databaseURL: "https://careplus-c1a15-default-rtdb.firebaseio.com",
         projectId: "careplus-c1a15",
         storageBucket: "careplus-c1a15.firebasestorage.app",
         messagingSenderId: "285406731152",
         appId: "1:285406731152:web:e82d4b75e0d7718a2c3115",
+=======
+
+        authDomain: "careplus-c1a15.firebaseapp.com",
+
+        databaseURL: "https://careplus-c1a15-default-rtdb.firebaseio.com",
+
+        projectId: "careplus-c1a15",
+
+        storageBucket: "careplus-c1a15.firebasestorage.app",
+
+        messagingSenderId: "285406731152",
+
+        appId: "1:285406731152:web:e82d4b75e0d7718a2c3115",
+
+>>>>>>> Stashed changes
         measurementId: "G-EYE0W03VLZ",
       ),
     );
