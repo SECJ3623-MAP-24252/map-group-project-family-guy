@@ -8,12 +8,11 @@ import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
 import 'screens/relative/chat.dart';
-import 'screens/contacts/contact_list_screen.dart'; // New import
+import 'screens/contacts/contact_list_screen.dart';
 import 'viewmodels/appointment_viewmodel.dart';
 import 'viewmodels/medicine_viewmodel.dart';
-import 'viewmodels/contact_viewmodel.dart'; // New import
+import 'viewmodels/contact_viewmodel.dart';
 import 'screens/home/homepage_screen.dart' as home_page;
-//import 'screens/home/nearby_hospitals_screen.dart';
 import 'screens/home/old_homepage_screen.dart';
 import 'screens/login/login_screen.dart';
 import 'screens/login/signup_screen.dart';
@@ -27,44 +26,28 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:Care_Plus/screens/hospital/hospital_map_logic.dart';
 import 'package:Care_Plus/screens/hospital/hospital_map_screen.dart';
+
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-   await dotenv.load(); 
+  await dotenv.load();
+
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
         apiKey: "AIzaSyBuipbmUvwBrYmtky-RH6519YIFoj9FWoI",
-<<<<<<< Updated upstream
         authDomain: "careplus-c1a15.firebaseapp.com",
         databaseURL: "https://careplus-c1a15-default-rtdb.firebaseio.com",
         projectId: "careplus-c1a15",
         storageBucket: "careplus-c1a15.firebasestorage.app",
         messagingSenderId: "285406731152",
         appId: "1:285406731152:web:e82d4b75e0d7718a2c3115",
-=======
-
-        authDomain: "careplus-c1a15.firebaseapp.com",
-
-        databaseURL: "https://careplus-c1a15-default-rtdb.firebaseio.com",
-
-        projectId: "careplus-c1a15",
-
-        storageBucket: "careplus-c1a15.firebasestorage.app",
-
-        messagingSenderId: "285406731152",
-
-        appId: "1:285406731152:web:e82d4b75e0d7718a2c3115",
-
->>>>>>> Stashed changes
         measurementId: "G-EYE0W03VLZ",
       ),
     );
   } else {
-    
-
     await Firebase.initializeApp();
   }
 
@@ -75,12 +58,14 @@ Future<void> main() async {
   await flutterLocalNotificationsPlugin.initialize(
     const InitializationSettings(android: androidInit),
   );
+
   const channel = AndroidNotificationChannel(
     'appt_channel',
     'Appointment Reminders',
     description: 'Channel for appointment notifications',
     importance: Importance.high,
   );
+
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
         AndroidFlutterLocalNotificationsPlugin
@@ -94,9 +79,7 @@ Future<void> main() async {
           create: (_) => AppointmentViewModel(flutterLocalNotificationsPlugin),
         ),
         ChangeNotifierProvider(create: (_) => MedicineViewModel()),
-        ChangeNotifierProvider(
-          create: (_) => ContactViewModel(), // New provider
-        ),
+        ChangeNotifierProvider(create: (_) => ContactViewModel()),
       ],
       child: const CarePlusApp(),
     ),
@@ -124,7 +107,7 @@ class CarePlusApp extends StatelessWidget {
                 Navigator.of(c).pushReplacementNamed(AppRoutes.main);
               },
             ),
-        AppRoutes.contacts: (c) => const ContactListScreen(), // New route
+        AppRoutes.contacts: (c) => const ContactListScreen(),
         AppRoutes.contactRelatives:
             (c) =>
                 const ChatPage(name: 'son', imagePath: 'assets/images/man.png'),
@@ -154,7 +137,7 @@ class AppRoutes {
   static const profile = '/profile';
   static const profileEdit = '/profile/edit';
   static const loading = '/loading';
-  static const contacts = '/contacts'; // New route
+  static const contacts = '/contacts';
   static const contactRelatives = '/contact-relatives';
 }
 
@@ -169,14 +152,9 @@ class _MainScaffoldState extends State<MainScaffold> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
-<<<<<<< HEAD
-=======
-    HospitalMapScreen(),
-    Center(child: Icon(Icons.search)),
->>>>>>> 66066b2e12c1e959ac47d994ef6164037b9d2fcc
     home_page.HomepageScreen(),
     AppointmentListPage(),
-    ContactListScreen(), // Changed from RelativeListPage to ContactListScreen
+    ContactListScreen(),
     profile_page.ProfileScreen(),
   ];
 
@@ -270,14 +248,14 @@ class _MainScaffoldState extends State<MainScaffold> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.contacts, // Changed from chat to contacts
+                        Icons.contacts,
                         color:
                             _currentIndex == 2
                                 ? Theme.of(context).primaryColor
                                 : Colors.grey,
                       ),
                       Text(
-                        'Contacts', // Changed from Chat to Contacts
+                        'Contacts',
                         style: TextStyle(
                           color:
                               _currentIndex == 2
@@ -322,4 +300,4 @@ class _MainScaffoldState extends State<MainScaffold> {
       ),
     );
   }
-} 
+}
