@@ -29,18 +29,10 @@ class HospitalMapLogic {
 
   // current location
   Future<LatLng?> getCurrentLocation() async {
-    LocationPermission perm = await Geolocator.checkPermission();
-    if (perm == LocationPermission.denied ||
-        perm == LocationPermission.deniedForever) {
-      perm = await Geolocator.requestPermission();
-      if (perm != LocationPermission.always &&
-          perm != LocationPermission.whileInUse) {
-        return null;
-      }
-    }
-    final pos = await Geolocator.getCurrentPosition();
-    return LatLng(pos.latitude, pos.longitude);
-  }
+  
+  return const LatLng(1.56418, 103.63802);
+}
+
 
   // nearby place
   Future<List<Hospital>> fetchHospitals(LatLng center) async {
@@ -48,7 +40,7 @@ class HospitalMapLogic {
     final loc = '${center.latitude},${center.longitude}';
     final nearbyUrl = Uri.parse(
       'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
-      '?location=$loc&radius=2000&type=hospital&key=$_apiKey',
+      '?location=$loc&radius=4000&type=hospital&key=$_apiKey',
     );
 
     final nearbyRes = await http.get(nearbyUrl);
@@ -90,7 +82,7 @@ class HospitalMapLogic {
     return Future.wait(futures);
   }
 
-  //  Marker 工厂
+  //  Marker
   List<Marker> createMarkers(List<Hospital> list, BuildContext ctx) {
     return list.map((h) {
       return Marker(

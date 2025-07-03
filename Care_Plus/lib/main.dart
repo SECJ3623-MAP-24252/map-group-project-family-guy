@@ -9,7 +9,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'screens/relative/chat.dart';
 import 'viewmodels/appointment_viewmodel.dart';
 import 'screens/home/homepage_screen.dart' as home_page;
-import 'screens/home/nearby_hospitals_screen.dart';
+//import 'screens/home/nearby_hospitals_screen.dart';
 import 'screens/home/old_homepage_screen.dart';
 import 'screens/login/login_screen.dart';
 import 'screens/login/signup_screen.dart';
@@ -17,11 +17,16 @@ import 'screens/profile/profile_screen.dart' as profile_page;
 import 'screens/profile/profile_edit_screen.dart';
 import 'shared/splash_screen.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'package:Care_Plus/screens/hospital/hospital_map_logic.dart';
+import 'package:Care_Plus/screens/hospital/hospital_map_screen.dart';
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+   await dotenv.load(); 
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
@@ -36,6 +41,8 @@ Future<void> main() async {
       ),
     );
   } else {
+    
+
     await Firebase.initializeApp();
   }
 
@@ -131,7 +138,7 @@ class _MainScaffoldState extends State<MainScaffold> {
   int _currentIndex = 2;
 
   final List<Widget> _pages = [
-    NearbyHospitalsScreen(),
+    HospitalMapScreen(),
     Center(child: Icon(Icons.search)),
     home_page.HomepageScreen(),
     const ChatPage(name: 'son', imagePath: 'assets/images/man.png'),
@@ -163,4 +170,4 @@ class _MainScaffoldState extends State<MainScaffold> {
       ),
     );
   }
-}
+} 

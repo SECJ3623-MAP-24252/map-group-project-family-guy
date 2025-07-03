@@ -1,20 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
 import 'package:Care_Plus/screens/home/manage_medicine_screen.dart';
-import 'package:Care_Plus/screens/home/nearby_hospitals_screen.dart';
+//import 'package:Care_Plus/screens/home/nearby_hospitals_screen.dart';
 import 'package:Care_Plus/screens/relative/chat.dart';
+import 'package:Care_Plus/screens/hospital/hospital_map_logic.dart';
+import 'package:Care_Plus/screens/hospital/hospital_map_screen.dart';
+
 
 class OldHomepageScreen extends StatelessWidget {
-  final List<Map<String, dynamic>> features = [
-    {'title': 'Appointment Reminder', 'icon': Icons.calendar_today},
-    {'title': 'Add Medicine Reminder', 'icon': Icons.medication_outlined},
-    {'title': 'Locate Nearby Hospital', 'icon': Icons.local_hospital},
-    {'title': 'Contact Relatives', 'icon': Icons.phone_in_talk},
-    {'title': 'Emergency Location', 'icon': Icons.emergency_share},
-    {'title': 'Documents', 'icon': Icons.description_outlined},
-    {'title': 'Node', 'icon': Icons.device_hub},
-    {'title': 'Relative', 'icon': Icons.group},
+  static const List<Map<String, dynamic>> features = <Map<String, dynamic>>[
+    
+    const {'title': 'Appointment Reminder',         'icon': Icons.calendar_today},
+    const {'title': 'Add Medicine Reminder',       'icon': Icons.medication_outlined},
+    const {'title': 'Locate Nearby Hospital',      'icon': Icons.local_hospital},
+    const {'title': 'Contact Relatives',           'icon': Icons.phone_in_talk},
+    const {'title': 'Emergency Location',          'icon': Icons.emergency_share},
+    const {'title': 'Documents',                   'icon': Icons.description_outlined},
+    const {'title': 'Node',                        'icon': Icons.device_hub},
+    const {'title': 'Relative',                    'icon': Icons.group},
   ];
+
+ 
+  const OldHomepageScreen({Key? key}) : super(key: key);
 
   void _navigateToFeature(BuildContext context, String title) {
     switch (title) {
@@ -41,7 +48,7 @@ class OldHomepageScreen extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => NearbyHospitalsScreen(),
+            builder: (_) => HospitalMapScreen(),
           ),
         );
         break;
@@ -141,7 +148,7 @@ class OldHomepageScreen extends StatelessWidget {
 class ComingSoonPage extends StatelessWidget {
   final String title;
 
-  const ComingSoonPage({Key? key, required this.title}) : super(key: key);
+  const ComingSoonPage({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
