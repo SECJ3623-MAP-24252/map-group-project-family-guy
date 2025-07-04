@@ -1,3 +1,4 @@
+import 'package:Care_Plus/Node/node_page.dart';
 import 'package:Care_Plus/screens/document/document.dart';
 import 'package:flutter/material.dart';
 import 'package:Care_Plus/screens/profile/profile_screen.dart' as profile_page;
@@ -46,6 +47,9 @@ class OldHomepageScreen extends StatelessWidget {
           context,
           MaterialPageRoute(builder: (_) => HealthDataPage()),
         );
+        break;
+      case 'Node':
+        Navigator.push(context, MaterialPageRoute(builder: (_) => NotesPage()));
         break;
       case 'Locate Nearby Hospital':
         Navigator.push(
