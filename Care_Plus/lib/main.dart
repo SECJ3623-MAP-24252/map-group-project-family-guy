@@ -22,9 +22,7 @@ import 'screens/profile/profile_edit_screen.dart';
 import 'shared/splash_screen.dart';
 import 'screens/appointment/appointment_list_page.dart';
 import 'screens/relative/relative_list_page.dart';
-
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 import 'package:Care_Plus/screens/hospital/hospital_map_logic.dart';
 import 'package:Care_Plus/screens/hospital/hospital_map_screen.dart';
 
