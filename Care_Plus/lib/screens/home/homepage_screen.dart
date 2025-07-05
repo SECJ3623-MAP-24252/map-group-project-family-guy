@@ -21,9 +21,90 @@ class HomepageScreen extends StatefulWidget {
 }
 
 class _HomepageScreenState extends State<HomepageScreen> {
-  final _profileDoc = FirebaseFirestore.instance
-      .collection('profiles_demo')
-      .doc('currentProfile');
+  final _profileDoc = FirebaseFirestore.instance.collection('profiles_demo').doc('currentProfile');
+  bool showReminderPanel = false;
+  List<Map<String, dynamic>> reminderList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    loadLatestReminders();
+  }
+
+  Future<void> loadLatestReminders() async {
+  List<Map<String, dynamic>> tempList = [];
+
+
+String _monthStr(int month) {
+  const months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+  return months[month - 1];
+}
+  // 拿 medicine 的最新一条
+  final medSnap = await FirebaseFirestore.instance
+      .collection('medicines')
+      .orderBy('createdAt', descending: true)
+      .limit(1)
+      .get();
+
+  if (medSnap.docs.isNotEmpty) {
+    final data = medSnap.docs.first.data();
+    final name = data['name'];
+    final times = List<String>.from(data['times'] ?? []);
+    final days = List<String>.from(data['days'] ?? []);
+    tempList.add({
+      'title': 'Take Medicine: $name',
+      'time': '${times.isNotEmpty ? times[0] : 'N/A'}, ${days.isNotEmpty ? days[0] : 'N/A'}',
+      'status': 'Upcoming',
+      'icon': Icons.medication_outlined,
+    });
+  }
+
+  // 拿 appointment 的最新一条
+  final appSnap = await FirebaseFirestore.instance
+      .collection('appointments')
+      .orderBy('dateTime', descending: true)
+      .limit(1)
+      .get();
+
+  if (appSnap.docs.isNotEmpty) {
+    final data = appSnap.docs.first.data();
+    final patient = data['patientName'] ?? 'Unknown Patient';
+    final rawDate = data['dateTime']?.toString() ?? 'Unknown Date';
+
+    String timeStr = rawDate;
+    try {
+      final dt = DateTime.parse(rawDate);
+      timeStr =
+          '${dt.day.toString().padLeft(2, '0')} ${_monthStr(dt.month)} ${dt.year}, ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}';
+    } catch (_) {
+      // fallback
+    }
+
+    tempList.add({
+      'title': 'Appointment: $patient',
+      'time': timeStr,
+      'status': 'Upcoming',
+      'icon': Icons.calendar_today,
+    });
+  }
+
+  // 设置提醒
+  setState(() {
+    reminderList = tempList;
+  });
+
+
+
+  print('✅ 加载完毕 reminderList：共 ${tempList.length} 条');
+}
+
+
+  
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -36,14 +117,17 @@ class _HomepageScreenState extends State<HomepageScreen> {
     ];
     const double avatarSize = 64;
 
-    return SafeArea(
-      child: Container(
-        color: const Color(0xFFF1FDF2),
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+    return Stack(
+      children: [
+        SafeArea(
+          child: Container(
+            color: const Color(0xFFF1FDF2),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+            
               // -------------------- Profile Card --------------------
               StreamBuilder<DocumentSnapshot>(
                 stream: _profileDoc.snapshots(),
@@ -157,10 +241,27 @@ class _HomepageScreenState extends State<HomepageScreen> {
               ),
 
               // -------------------- Contact Relatives --------------------
-              const Text(
-                'Contact Relatives',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+               Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Contact Relatives',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          reminderList.isEmpty ? Icons.notifications_none : Icons.notifications,
+                          color: reminderList.isEmpty ? Colors.grey : Colors.red,
+                        ),
+                        tooltip: 'Show Reminders',
+                        onPressed: () {
+                          setState(() {
+                            showReminderPanel = !showReminderPanel;
+                          });
+                        },
+                      ),
+                    ],
+                  ),
               const SizedBox(height: 12),
               SizedBox(
                 height: avatarSize + 40,
@@ -349,10 +450,82 @@ class _HomepageScreenState extends State<HomepageScreen> {
               ),
 
               const SizedBox(height: 32),
-            ],
+             ],
+              ),
+            ),
+          ),
+        ),
+        // 🔔 提醒面板叠加在页面上
+    
+
+    if (showReminderPanel)
+      Positioned.fill(
+        child: GestureDetector(
+          onTap: () => setState(() => showReminderPanel = false),
+          child: Container(
+            color: Colors.black.withOpacity(0.3),
+            child: Center(
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery.of(context).size.height * 0.6,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: reminderList.isEmpty
+                    ? const Center(child: Text("No Reminders"))
+                    : ListView.builder(
+                        itemCount: reminderList.length,
+                        itemBuilder: (context, index) {
+                          final item = reminderList[index];
+                          return Dismissible(
+                            key: Key(item['title'] + index.toString()),
+                            direction: DismissDirection.endToStart,
+                            onDismissed: (dir) {
+                              setState(() {
+                                reminderList.removeAt(index);
+                                if (reminderList.isEmpty) {
+                                  showReminderPanel = false;
+                                }
+                              });
+                            },
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 20),
+                              color: Colors.red,
+                              child: const Icon(Icons.delete, color: Colors.white),
+                            ),
+                            child: Card(
+                              margin: const EdgeInsets.symmetric(vertical: 8),
+                              elevation: 2,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: ListTile(
+                                leading: Icon(item['icon']),
+                                title: Text(item['title']),
+                                subtitle: item['time'] != null ? Text(item['time']) : null,
+                                trailing: Text(
+                                  item['status'],
+                                  style: TextStyle(
+                                    color: item['status'] == 'Pending' ? Colors.red : Colors.green,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ),
           ),
         ),
       ),
+      ],
+  
+
+      
     );
   }
 }
